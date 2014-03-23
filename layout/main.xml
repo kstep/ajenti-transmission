@@ -1,0 +1,62 @@
+<body>
+    <vc id="main">
+        <label bind="torrent" />
+        <bind:collection bind="torrents" id="torrents">
+            <hc>
+                <button id="refresh" icon="refresh" text="{Refresh}" style="mini" />
+                <button bind="__add" text="{Add}" icon="download-alt" style="mini" />
+            </hc>
+
+            <dt bind="__items">
+                <dtr>
+                    <dth width="1%" />
+                    <dth text="{Name / Progress}" />
+                    <dth text="{Speed / Ratio}" />
+                    <dth width="60" text="{Priority}" />
+                    <dth width="60" text="{Actions}" />
+                </dtr>
+            </dt>
+            <bind:template>
+                <dtr>
+                    <dtd><icon icon="download" /></dtd>
+                    <dtd>
+                        <vc>
+                            <label bind="name" />
+                            <hc>
+                                <progressbar bind="percentDone" width="200" />
+                                <label bind="sizeWhenDone" style="small" />
+                                <label bind="totalSize" style="small" />
+                            </hc>
+                        </vc>
+                    </dtd>
+                    <dtd>
+                        <hc>
+                            <label bind="rateDownload" icon="download" />
+                            <label bind="rateUpload" icon="upload" />
+                            <label bind="uploadRatio" />
+                        </hc>
+                    </dtd>
+                    <dtd>
+                        <hc>
+                            <togglebutton icon="arrow-down" style="mini" />
+                            <togglebutton icon="minus" style="mini" />
+                            <togglebutton icon="arrow-up" style="mini" />
+                        </hc>
+                    </dtd>
+                    <dtd>
+                        <hc>
+                            <button id="start" icon="play" style="mini" />
+                            <button id="pause" icon="pause" style="mini" visible="false" />
+                            <button id="recheck" icon="repeat" style="mini" />
+                            <button bind="__delete" icon="remove" style="mini" />
+                        </hc>
+                    </dtd>
+                </dtr>
+            </bind:template>
+        </bind:collection>
+
+        <bind:collection bind="torrent" id="torrent">
+
+        </bind:collection>
+    </vc>
+</body>
