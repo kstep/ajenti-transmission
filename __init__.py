@@ -3,7 +3,7 @@ from ajenti.plugins import *  # noqa
 
 info = PluginInfo(
     title='Transmission',
-    icon='download',
+    icon='download-alt',
     dependencies=[
         PluginDependency('main'),
         BinaryDependency('transmission-daemon'),

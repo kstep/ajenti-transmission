@@ -1,62 +1,86 @@
 <body>
-    <vc id="main">
-        <label bind="torrent" />
-        <bind:collection bind="torrents" id="torrents">
+    <pad id="main">
+        <vc>
             <hc>
                 <button id="refresh" icon="refresh" text="{Refresh}" style="mini" />
-                <button bind="__add" text="{Add}" icon="download-alt" style="mini" />
+                <button id="add" text="{Add torrent}" icon="download-alt" style="mini" />
             </hc>
+            <bind:collection bind="torrents" id="torrents">
 
-            <dt bind="__items">
-                <dtr>
-                    <dth width="1%" />
-                    <dth text="{Name / Progress}" />
-                    <dth text="{Speed / Ratio}" />
-                    <dth width="60" text="{Priority}" />
-                    <dth width="60" text="{Actions}" />
-                </dtr>
-            </dt>
-            <bind:template>
-                <dtr>
-                    <dtd><icon icon="download" /></dtd>
-                    <dtd>
-                        <vc>
-                            <label bind="name" />
+                <dt bind="__items">
+                    <dtr>
+                        <dth width="1%" />
+                        <dth text="{Name}" />
+                        <dth width="150" text="{Progress}" />
+                        <dth width="60" text="{Priority}" />
+                        <dth width="60" text="{Actions}" />
+                    </dtr>
+                </dt>
+                <bind:template>
+                    <dtr>
+                        <dtd><tooltip bind="status"><icon bind="icon" /></tooltip></dtd>
+                        <dtd>
+                            <collapse>
+                                <label bind="name" style="bold" />
+
+                                <label bind="downloaded_ever" />
+                                <label text="/" />
+                                <label bind="size_when_done" />
+
+                                <label text=" (" />
+                                <label bind="total_size" />
+                                <label text="), " />
+
+                                <label bind="time_left" />
+                                <label text=" left" />
+                            </collapse>
+                        </dtd>
+                        <dtd>
+                            <right><label bind="progress_str" /></right>
+                            <progressbar bind="percentDone" width="100" style="small" />
+                        </dtd>
+                        <dtd>
                             <hc>
-                                <progressbar bind="percentDone" width="200" />
-                                <label bind="sizeWhenDone" style="small" />
-                                <label bind="totalSize" style="small" />
+                                <tooltip text="Low priority"><togglebutton id="priority_low" bind:pressed="is_priority_low" icon="arrow-down" style="mini" /></tooltip>
+                                <tooltip text="Normal priority"><togglebutton id="priority_normal" bind:pressed="is_priority_normal" icon="minus" style="mini" /></tooltip>
+                                <tooltip text="High priority"><togglebutton id="priority_high" bind:pressed="is_priority_high" icon="arrow-up" style="mini" /></tooltip>
                             </hc>
-                        </vc>
-                    </dtd>
-                    <dtd>
-                        <hc>
-                            <label bind="rateDownload" icon="download" />
-                            <label bind="rateUpload" icon="upload" />
-                            <label bind="uploadRatio" />
-                        </hc>
-                    </dtd>
-                    <dtd>
-                        <hc>
-                            <togglebutton icon="arrow-down" style="mini" />
-                            <togglebutton icon="minus" style="mini" />
-                            <togglebutton icon="arrow-up" style="mini" />
-                        </hc>
-                    </dtd>
-                    <dtd>
-                        <hc>
-                            <button id="start" icon="play" style="mini" />
-                            <button id="pause" icon="pause" style="mini" visible="false" />
-                            <button id="recheck" icon="repeat" style="mini" />
-                            <button bind="__delete" icon="remove" style="mini" />
-                        </hc>
-                    </dtd>
-                </dtr>
-            </bind:template>
-        </bind:collection>
+                        </dtd>
+                        <dtd>
+                            <hc>
+                                <tooltip text="Start"><button id="start" icon="play" style="mini" bind:visible="is_stopped" /></tooltip>
+                                <tooltip text="Stop"><button id="stop" icon="pause" style="mini" bind:visible="is_started" /></tooltip>
+                                <tooltip text="Details"><button id="details" icon="info" style="mini" /></tooltip>
+                                <tooltip text="Remove"><button bind="__delete" icon="remove" style="mini" warning="Remove the torrent from list?" /></tooltip>
+                            </hc>
+                        </dtd>
+                    </dtr>
+                </bind:template>
+            </bind:collection>
 
-        <bind:collection bind="torrent" id="torrent">
+            <bind:collection bind="torrent" id="torrent">
 
-        </bind:collection>
-    </vc>
+            </bind:collection>
+        </vc>
+    </pad>
+
+    <dialog visible="False" id="add_dialog" buttons="[
+        {'id': 'add', 'text': _('Add')},
+        {'id': 'cancel', 'text': _('Cancel')}
+        ]">
+        <pad>
+            <formgroup text="Add new torrent">
+                <formline text="{URL}">
+                    <textbox id="new_url" />
+                </formline>
+                <formline text="{Download to}">
+                    <textbox id="target_dir" />
+                </formline>
+                <formline>
+                    <checkbox text="{Pause on add}" id="add_paused" />
+                </formline>
+                <formline />
+            </formgroup>
+        </pad>
+    </dialog>
 </body>
