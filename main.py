@@ -1,11 +1,14 @@
 # -*- encoding: utf-8 -*-
 from ajenti.api import *  # noqa
+from ajenti.api.http import HttpPlugin, url
 from ajenti.plugins import *  # noqa
 from ajenti.plugins.main.api import SectionPlugin
 from ajenti.ui.binder import Binder
 from ajenti.ui import on
 from ajenti.util import str_fsize, str_timedelta
 from transmissionrpc import torrent, client
+import os
+import base64
 
 TransmissionTorrent = torrent.Torrent
 class Torrent(TransmissionTorrent):
@@ -91,6 +94,8 @@ class TransmissionPlugin (SectionPlugin):
         self.find('torrents').delete_item = self.remove
         self.binder = Binder(self, self.find('main'))
 
+        self.find('add_dialog').find('target_dir').value = os.path.expanduser('~transmission/Downloads')
+
     def on_first_page_load(self):
         self._client = client.Client()
         self.refresh()
@@ -136,6 +141,7 @@ class TransmissionPlugin (SectionPlugin):
     def open_add_dialog(self):
         self.find('add_dialog').visible = True
 
+    _torrent_data = None
     @on('add_dialog', 'button')
     def submit_add_dialog(self, button):
         dialog = self.find('add_dialog')
@@ -147,14 +153,35 @@ class TransmissionPlugin (SectionPlugin):
                     'download_dir': dialog.find('target_dir').value,
                     }
 
-            urls = dialog.find('new_url').value.strip().splitlines()
-            for url in urls:
-                url = url.strip()
+            url = dialog.find('url').value.strip()
+            if url:
+                torrent = url
+                if not url.startswith(('file://', 'http://', 'https://', 'ftp://', 'ftps://', 'magnet:')):
+                    torrent = 'file://' + url
 
-                if not url.startswith(('file://', 'http://', 'https://', 'ftp://', 'ftps://')):
-                    url = 'file://' + url
+            else:
+                url = dialog.find('local_file').value.strip()
+                if url:
+                    torrent = 'file://' + url
 
-                self._client.add_torrent(url, **options)
+                elif self._torrent_data:
+                    torrent = self._torrent_data
+                    self._torrent_data = None
+
+                else:
+                    return
+
+            self._client.add_torrent(torrent, **options)
 
             self.refresh()
+
+@plugin
+class UploadReceiver (HttpPlugin):
+    @url('/ajenti:transmission-upload')
+    def handle_upload(self, context):
+        file = context.query['file']
+        data = base64.encodestring(file.read())
+        context.session.endpoint.get_section(FileManager)._torrent_data = data
+        context.respond_ok()
+        return 'OK'
 

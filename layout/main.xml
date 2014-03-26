@@ -23,21 +23,23 @@
                             <collapse>
                                 <label bind="name" style="bold" />
 
-                                <label bind="downloaded_ever" />
-                                <label text="/" />
-                                <label bind="size_when_done" />
+                                <label style="small" bind="downloaded_ever" />
+                                <label style="small" text="/" />
+                                <label style="small" bind="size_when_done" />
 
-                                <label text=" (" />
-                                <label bind="total_size" />
-                                <label text="), " />
+                                <label style="small" text=" (" />
+                                <label style="small" bind="total_size" />
+                                <label style="small" text="), " />
 
-                                <label bind="time_left" />
-                                <label text=" left" />
+                                <label style="small" bind="time_left" />
+                                <label style="small" text=" left" />
                             </collapse>
                         </dtd>
                         <dtd>
-                            <right><label bind="progress_str" /></right>
-                            <progressbar bind="percentDone" width="100" style="small" />
+                            <hc>
+                                <label bind="progress_str" style="mini" />
+                                <progressbar bind="percentDone" width="100" />
+                            </hc>
                         </dtd>
                         <dtd>
                             <hc>
@@ -70,16 +72,28 @@
         ]">
         <pad>
             <formgroup text="Add new torrent">
-                <formline text="{URL}">
-                    <textbox id="new_url" />
-                </formline>
-                <formline text="{Download to}">
-                    <textbox id="target_dir" />
-                </formline>
-                <formline>
-                    <checkbox text="{Pause on add}" id="add_paused" />
-                </formline>
-                <formline />
+                <vc>
+                    <formline text="{URL}">
+                        <textbox id="url" />
+                    </formline>
+                    <formline text="{Local file}">
+                        <pathbox id="local_file" />
+                    </formline>
+                    <formline text="{Upload file}">
+                        <fileupload id="upload_file" target="ajenti:transmission-upload" />
+                    </formline>
+                </vc>
+            </formgroup>
+
+            <formgroup text="Download options">
+                <vc>
+                    <formline text="{Download to}">
+                        <pathbox id="target_dir" directory="True" />
+                    </formline>
+                    <formline>
+                        <checkbox text="{Pause on add}" id="add_paused" value="True" />
+                    </formline>
+                </vc>
             </formgroup>
         </pad>
     </dialog>
