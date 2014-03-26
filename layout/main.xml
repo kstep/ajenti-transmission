@@ -4,9 +4,9 @@
             <hc>
                 <button id="refresh" icon="refresh" text="{Refresh}" style="mini" />
                 <button id="add" text="{Add torrent}" icon="download-alt" style="mini" />
+                <button id="start_all" text="{Start all}" icon="play" style="mini" />
             </hc>
             <bind:collection bind="torrents" id="torrents">
-
                 <dt bind="__items">
                     <dtr>
                         <dth width="1%" />
@@ -60,9 +60,158 @@
                 </bind:template>
             </bind:collection>
 
-            <bind:collection bind="torrent" id="torrent">
+            <formgroup text="{Torrent info}" bind:visible="show_details">
+                <vc>
+                    <bind:dict bind="torrent" id="torrent">
+                        <dt>
+                            <dtr>
+                                <dth text="{Name}" width="120" />
+                                <dtd><label bind="name" /></dtd>
+                                <dth text="{Priority}" />
+                                <dtd><label bind="priority" /><label text=" (" /><label bind="bandwidthPriority" /><label text=")" /></dtd>
+                            </dtr>
+                            <dtr>
+                                <dth text="{Destionation}" />
+                                <dtd><label bind="downloadDir" /></dtd>
+                                <dth text="{Peers}" />
+                                <dtd>
+                                    <lt>
+                                        <ltr>
+                                            <ltd><icon icon="arrow-down" /><label bind="peersSendingToUs" /></ltd>
+                                            <ltd><icon icon="arrow-up" /><label bind="peersGettingFromUs" /></ltd>
+                                            <ltd><icon icon="exchange" /><label bind="peersConnected" /></ltd>
+                                        </ltr>
+                                    </lt>
+                                </dtd>
+                            </dtr>
+                            <dtr>
+                                <dth text="{Speed}" />
+                                <dtd>
+                                    <lt>
+                                        <ltr>
+                                            <ltd><icon icon="arrow-down" /><label bind="rate_download" /></ltd>
+                                            <ltd><icon icon="arrow-up" /><label bind="rate_upload" /></ltd>
+                                            <ltd><icon icon="time" /><label bind="time_left" /></ltd>
+                                        </ltr>
+                                    </lt>
+                                </dtd>
+                                <dth text="{Time}" />
+                                <dtd>
+                                    <lt>
+                                        <ltr>
+                                            <ltd><icon icon="arrow-down" /><label bind="seconds_downloading" /></ltd>
+                                            <ltd><icon icon="arrow-up" /><label bind="seconds_seeding" /></ltd>
+                                        </ltr>
+                                    </lt>
+                                </dtd>
+                            </dtr>
+                            <dtr>
+                                <dth text="{Volume}" />
+                                <dtd>
+                                    <lt>
+                                        <ltr>
+                                            <ltd><icon icon="arrow-down" /><label bind="downloaded_ever" /></ltd>
+                                            <ltd><icon icon="arrow-up" /><label bind="uploaded_ever" /></ltd>
+                                            <ltd><icon icon="exchange" /><label bind="uploadRatio" /></ltd>
+                                        </ltr>
+                                    </lt>
+                                </dtd>
+                                <dth text="{Size}" />
+                                <dtd>
+                                    <label bind="total_size" />
+                                    <label text=", selected " />
+                                    <label bind="size_when_done" />
+                                </dtd>
+                            </dtr>
+                            <!--<dtr>
+                                <dth text="{Annoucement}" />
+                                <dtd>
+                                    <lt>
+                                        <ltr>
+                                            <ltd><icon icon="link" /><label bind="announceURL" /></ltd>
+                                        </ltr>
+                                        <ltr>
+                                            <ltd><icon icon="repeat" /><label bind="announceResponse" /></ltd>
+                                        </ltr>
+                                    </lt>
+                                </dtd>
+                                <dth />
+                                <dtd>
+                                    <lt>
+                                        <ltr>
+                                            <ltd><icon icon="arrow-down" /><label bind="last_scrape_time" /></ltd>
+                                            <ltd><icon icon="arrow-up" /><label bind="last_announce_time" /></ltd>
+                                        </ltr>
+                                    </lt>
+                                </dtd>
+                            </dtr>-->
+                            <!--<dtr>
+                                <dth text="{Limits}" />
+                                <dtd>
+                                    <formline text="{Use session limits}">
+                                        <checkbox bind="honorsSessionLimits" />
+                                    </formline>
+                                    <formline text="{Download speed}">
+                                        <checkbox bind="downloadLimited" />
+                                        <inputbox bind="downloadLimit" type="number" />
+                                        <dropdown values="[0,1,2]" labels="['Global','Torrent','Unlimited']" bind="downloadLimitSpeed" />
+                                    </formline>
+                                    <formline text="{Upload speed}">
+                                        <checkbox bind="uploadLimited" />
+                                        <inputbox bind="uploadLimit" type="number" />
+                                        <dropdown values="[0,1,2]" labels="['Global','Torrent','Unlimited']" bind="uploadLimitSpeed" />
+                                    </formline>
+                                    <formline text="{Ratio}">
+                                        <inputbox bind="seedRatioLimit" type="number" />
+                                        <dropdown values="[0,1,2]" labels="['Global','Torrent','Unlimited']" bind="seedRatioMode" />
+                                    </formline>
+                                    <formline text="{Seed idle}">
+                                        <inputbox bind="seedIdleLimit" type="number" />
+                                        <dropdown values="[0,1,2]" labels="['Global','Torrent','Unlimited']" bind="seedIdleMode" />
+                                    </formline>
+                                    <formline text="{Peers}">
+                                        <inputbox bind="peer_limit" />
+                                    </formline>
+                                </dtd>
+                            </dtr>-->
+                        </dt>
+                    </bind:dict>
 
-            </bind:collection>
+                    <bind:collection bind="files" id="files">
+                        <button id="apply" icon="ok" text="{Apply changes}" />
+
+                        <dt bind="__items">
+                            <dtr>
+                                <dth width="1%" />
+                                <dth text="{Name}" />
+                                <dth text="{Size}" />
+                                <dth text="{Progress}" />
+                                <dth width="60" text="{Priority}" />
+                            </dtr>
+                        </dt>
+                        <bind:template>
+                            <dtr>
+                                <dtd><checkbox bind="selected" /></dtd>
+                                <dtd><label bind="name" /></dtd>
+                                <dtd><label bind="completed_str" /><label text=" / " /><label bind="size_str" /></dtd>
+                                <dtd>
+                                    <hc>
+                                        <label bind="progress_str" style="mini" />
+                                        <progressbar bind="percentDone" width="100" />
+                                    </hc>
+                                </dtd>
+                                <dtd>
+                                    <hc>
+                                        <tooltip text="Low priority"><togglebutton id="priority_low" bind:pressed="is_priority_low" icon="arrow-down" style="mini" /></tooltip>
+                                        <tooltip text="Normal priority"><togglebutton id="priority_normal" bind:pressed="is_priority_normal" icon="minus" style="mini" /></tooltip>
+                                        <tooltip text="High priority"><togglebutton id="priority_high" bind:pressed="is_priority_high" icon="arrow-up" style="mini" /></tooltip>
+                                    </hc>
+                                </dtd>
+                            </dtr>
+                        </bind:template>
+                    </bind:collection>
+                </vc>
+            </formgroup>
         </vc>
     </pad>
 
