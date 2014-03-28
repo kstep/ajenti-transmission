@@ -49,12 +49,15 @@ class Connection(object):
         self._tag = itertools.count(random.randint(0, 1000))
 
     def __getattr__(self, name):
+        name = name.replace('_', '-')
+        if name not in self._commands:
+            raise AttributeError(name)
+
         method = (lambda self, **kwargs: self._do_request(name, kwargs)).__get__(self, self.__class__)
         setattr(self, name, method)
         return method
 
     def _do_request(self, name, args):
-        name = name.replace('_', '-')
         tag = self._tag.next()
 
         data = {
