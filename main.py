@@ -206,6 +206,7 @@ class TransmissionPlugin (SectionPlugin):
         self.refresh()
 
     @on('refresh', 'click')
+    @profile
     def refresh(self):
         self.torrents = self._client.get_torrents()
 
