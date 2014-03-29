@@ -6,8 +6,8 @@ info = PluginInfo(
     icon='download-alt',
     dependencies=[
         PluginDependency('main'),
+        PluginDependency('models'),
         BinaryDependency('transmission-daemon'),
-        ModuleDependency('transmissionrpc'),
     ],
 )
 

@@ -7,150 +7,13 @@ from ajenti.plugins.main.api import SectionPlugin
 from ajenti.ui.binder import Binder
 from ajenti.ui import on
 from ajenti.util import str_fsize, str_timedelta
-from transmissionrpc import torrent, client
+from ajenti.plugins.transmission.client import Client
+from ajenti.plugins.models.api import Model
 from datetime import datetime
 import time
 import base64
 import gevent
 import os
-
-class TorrentFile(object):
-    id = None
-    _data = {}
-
-    def get(self, key, default=None):
-        return self._data.get(key, default)
-
-    def __getattr__(self, key):
-        try:
-            return self._data[key]
-        except KeyError:
-            raise AttributeError(key)
-
-    def __setitem__(self, key, value):
-        self._data[key] = value
-
-    def __init__(self, kv):
-        self.id, self._data = kv
-
-        self.is_priority_low = self.priority == 'low'
-        self.is_priority_normal = self.priority == 'normal'
-        self.is_priority_high = self.priority == 'high'
-
-        self.percentDone = done = self.completed / self.size
-        self.progress = progress = done * 100
-        self.progress_str = '%0.2f%%' % progress
-
-        self.completed_str = str_fsize(self.completed)
-        self.size_str = str_fsize(self.size)
-
-        self.icon = 'play' if self.selected else 'pause'
-        self.is_started = self.selected
-        self.is_stopped = not self.selected
-
-    def set_priority(self, priority):
-        assert priority in ('low', 'normal', 'high')
-        self._data['priority'] = priority
-        self.is_priority_low = self.priority == 'low'
-        self.is_priority_normal = self.priority == 'normal'
-        self.is_priority_high = self.priority == 'high'
-
-TransmissionTorrent = torrent.Torrent
-class Torrent(TransmissionTorrent):
-    def get(self, key, default=None):
-        return getattr(self, key, default)
-
-    def __setitem__(self, key, value):
-        try:
-            setattr(self, key, value)
-        except AttributeError:
-            pass
-
-    @property
-    def last_scrape_time(self):
-        pass
-
-    @property
-    def seconds_seeding(self):
-        return str_timedelta(self.secondsSeeding)
-
-    @property
-    def seconds_downloading(self):
-        return str_timedelta(self.secondsDownloading)
-
-    @property
-    def is_priority_high(self):
-        return self.priority == 'high'
-
-    @property
-    def is_priority_low(self):
-        return self.priority == 'low'
-
-    @property
-    def is_priority_normal(self):
-        return self.priority == 'normal'
-
-    @property
-    def rate_download(self):
-        return str_fsize(self.rateDownload)
-
-    @property
-    def rate_upload(self):
-        return str_fsize(self.rateUpload)
-
-    @property
-    def total_size(self):
-        return str_fsize(self.totalSize)
-
-    @property
-    def size_when_done(self):
-        return str_fsize(self.sizeWhenDone)
-
-    @property
-    def uploaded_ever(self):
-        return str_fsize(self.uploadedEver)
-
-    @property
-    def downloaded_ever(self):
-        return str_fsize(self.downloadedEver)
-
-    @property
-    def is_started(self):
-        return self.status != 'stopped'
-
-    @property
-    def is_stopped(self):
-        return self.status == 'stopped'
-
-    @property
-    def icon(self):
-        return {
-            'check pending': 'ellipsis-horizontal',
-            'checking': 'dashboard',
-            'downloading': 'download-alt',
-            'seeding': 'upload-alt',
-            'stopped': 'pause'
-            }.get(self.status, 'question')
-
-    @property
-    def time_left(self):
-        try:
-            return str_timedelta(self.eta)
-        except ValueError:
-            return 'unknown time'
-
-    @property
-    def progress_str(self):
-        return '%0.2f%%' % self.progress
-
-    @property
-    def content(self):
-        try:
-            return map(TorrentFile, sorted(self.files().items(), key=lambda kv: kv[0]))
-        except:
-            return []
-
-torrent.Torrent = client.Torrent = Torrent
 
 @plugin
 class TransmissionPlugin (SectionPlugin):
@@ -162,104 +25,129 @@ class TransmissionPlugin (SectionPlugin):
 
         self.append(self.ui.inflate('transmission:main'))
 
-        self.torrents = []
-        self.torrent = {}
-        self.show_details = False
-        self.files = []
+        self.scope = Model(
+                torrents=[],
+                torrent={},
+                files=[])
 
         def post_item_bind(root, collection, value, ui):
-            ui.find('priority_low').on('click', self.set_priority, value, 'low')
-            ui.find('priority_normal').on('click', self.set_priority, value, 'normal')
-            ui.find('priority_high').on('click', self.set_priority, value, 'high')
+            ui.find('priority_low').on('click', self.set_priority, value, -1)
+            ui.find('priority_normal').on('click', self.set_priority, value, 0)
+            ui.find('priority_high').on('click', self.set_priority, value, 1)
             ui.find('start').on('click', self.start, value)
             ui.find('stop').on('click', self.stop, value)
             ui.find('details').on('click', self.details, value)
+            ui.find('recheck').on('click', self.recheck, value)
 
         self.find('torrents').post_item_bind = post_item_bind
         self.find('torrents').delete_item = self.remove
 
 
         def post_file_bind(root, collection, value, ui):
-            ui.find('priority_low').on('click', self.set_file_priority, value, 'low')
-            ui.find('priority_normal').on('click', self.set_file_priority, value, 'normal')
-            ui.find('priority_high').on('click', self.set_file_priority, value, 'high')
+            ui.find('priority_low').on('click', self.set_file_priority, value, -1)
+            ui.find('priority_normal').on('click', self.set_file_priority, value, 0)
+            ui.find('priority_high').on('click', self.set_file_priority, value, 1)
 
-        self.find('files').post_item_bind = post_file_bind
+        #self.find('files').post_item_bind = post_file_bind
 
         self.find('add_dialog').find('target_dir').value = os.path.expanduser('~transmission/Downloads')
 
-        self.binder = Binder(self, self.find('main'))
+        self.binder = Binder(self.scope, self.find('main'))
 
     def on_first_page_load(self):
-        self._client = client.Client()
+        self._client = Client()
         self.refresh()
 
     @on('apply', 'click')
     def apply(self):
         self.binder.update()
-        self._client.set_files({
-            self.torrent.id: dict(
-                map(lambda f: (f.id, {'priority': f.priority, 'selected': f.selected}),
-                    self.files))
-            })
-        self.torrent.update()
+
+        files_wanted, files_unwanted = [], []
+        priority_low, priority_normal, priority_high = [], [], []
+        for file in self.scope.files:
+            (files_wanted if file.wanted else files_unwanted).append(file.id)
+            (priority_low if file.priority == -1 else
+             priority_high if file.priority == 1 else
+             priority_normal).append(file.id)
+
+        ids = [self.scope.torrent.id]
+
+        self._client.torrent_set(ids=ids, files_wanted=files_wanted, files_unwanted=files_unwanted,
+                priority_low=priority_low, priority_normal=priority_normal, priority_high=priority_high)
+
         self.refresh()
 
     @on('refresh', 'click')
-    @profile
     def refresh(self):
-        self.torrents = self._client.get_torrents()
+        self.scope.torrents = self._client.torrent_get(fields=['id', 'name', 'sizeWhenDone', 'leftUntilDone',
+            'percentDone', 'bandwidthPriority', 'totalSize', 'eta', 'status'])
 
-        if self.torrent:
-            #if self.torrent in self.torrents:
-            self.torrent.update()
-            self.files = self.torrent.content
-            #else:
-                #self.torrent = {}
-                #self.show_details = False
-
-        self.binder.populate()
+        if self.scope.torrent:
+            self.refresh_item(self.scope.torrent)
+        else:
+            self.binder.populate()
 
     def refresh_item(self, item):
-        item.update()
+        item.update(self._client.torrent_get(ids=[item.id], fields=['id', 'name', 'sizeWhenDone', 'leftUntilDone',
+            'percentDone', 'bandwidthPriority', 'totalSize', 'eta', 'status'])[0].__dict__)
         self.binder.populate()
 
     def set_priority(self, item, value):
-        item.priority = value
+        self._client.torrent_set(ids=[item.id], bandwidthPriority=value)
         self.refresh_item(item)
 
     def set_file_priority(self, item, value):
-        item.set_priority(value)
+        self.binder.update()
+        item.priority = value
         self.binder.populate()
 
     def start(self, item):
-        item.start()
+        self._client.torrent_start(ids=[item.id])
         self.refresh_item(item)
 
     def stop(self, item):
-        item.stop()
+        self._client.torrent_stop(ids=[item.id])
         self.refresh_item(item)
 
     @on('start_all', 'click')
     def start_all(self):
         self._client.start_all()
+        self.refresh()
+
+    @on('stop_all', 'click')
+    def stop_all(self):
+        self._client.stop_all()
+        self.refresh()
+
+    def recheck(self, item):
+        self._client.torrent_verify(ids=[item.id])
+        self.refresh_item(item)
 
     def details(self, item):
-        item.update()
-        self.torrent = item
-        self.files = item.content
-        self.show_details = True
+        self.scope.torrent = self._client.torrent_get(ids=[item.id], fields=[
+            'id', 'files', 'fileStats', 'name', 'torrentFile', 'downloadDir',
+            'peersSendingToUs', 'peersGettingFromUs', 'peersConnected',
+            'bandwidthPriority', 'secondsDownloading', 'secondsSeeding',
+            'downloadedEver', 'uploadedEver', 'uploadRatio',
+            'sizeWhenDone', 'totalSize', 'eta', 'rateUpload', 'rateDownload'])[0]
+        self.scope.files = self.scope.torrent.files
         self.binder.populate()
 
     def remove(self, item, collection):
-        self._client.remove_torrent([item.id], delete_data=False)
+        self._client.torrent_remove(ids=[item.id], delete_local_data=False)
 
     def delete(self, item, collection):
-        self._client.remove_torrent([item.id], delete_item=True)
+        self._client.torrent_remove(ids=[item.id], delete_local_data=True)
 
     @on('add', 'click')
     def open_add_dialog(self):
         self.find('add_dialog').visible = True
+
+    @on('move', 'click')
+    def open_move_dialog(self):
+        dialog = self.find('move_dialog')
+        dialog.find('target_dir').value = self.scope.torrent.download_dir
+        dialog.visible = True
 
     _torrent_data = None
     @on('add_dialog', 'button')
@@ -275,32 +163,45 @@ class TransmissionPlugin (SectionPlugin):
 
             url = dialog.find('url').value.strip()
             if url:
-                torrent = url
-                if not url.startswith(('file://', 'http://', 'https://', 'ftp://', 'ftps://', 'magnet:')):
-                    torrent = 'file://' + url
+                if url.startswith(('file://', 'http://', 'https://', 'ftp://', 'ftps://', 'magnet:')):
+                    options['filename'] = url
+
+                else:
+                    options['filename'] = 'file://' + url
 
             else:
                 url = dialog.find('local_file').value.strip()
                 if url:
-                    torrent = 'file://' + url
+                    options['filename'] = 'file://' + url
 
                 elif self._torrent_data:
-                    torrent = self._torrent_data
+                    options['metainfo'] = self._torrent_data
                     self._torrent_data = None
 
                 else:
                     return
 
-            added_torrent = self._client.add_torrent(torrent, **options)
+            added_torrent = self._client.torrent_add(**options)
             self.details(added_torrent)
             self.refresh()
+
+    @on('move_dialog', 'button')
+    def submit_move_dialog(self, button):
+        dialog = self.find('move_dialog')
+        dialog.visible = False
+
+        if button == 'move':
+            self._client.torrent_set_location(ids=[self.scope.torrent.id],
+                    location=dialog.find('target_dir').value, move=True)
+            self.refresh_item(self.scope.torrent)
+
 
 @plugin
 class UploadReceiver (HttpPlugin):
     @url('/ajenti:transmission-upload')
     def handle_upload(self, context):
         file = context.query['file']
-        data = base64.encodestring(file.read())
+        data = base64.encodestring(file.read()).replace('\n', '')
         context.session.endpoint.get_section(FileManager)._torrent_data = data
         context.respond_ok()
         return 'OK'

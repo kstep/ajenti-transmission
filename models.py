@@ -3,9 +3,36 @@ from ajenti.plugins.models.api import Model, unixtime, listof, sort, timedelta
 import operator as op
 import base64
 
-priority = lambda v: {-1: 'low', 0: 'normal', 1: 'high'}.get(int(v))
-mode = lambda v: ['global', 'single', 'unlimited'][int(v)]
+priority = {-1: 'low', 0: 'normal', 1: 'high'}.get
+mode = ['global', 'single', 'unlimited'].__getitem__
 eta = lambda v: 'unavailable' if v == -1 else 'unknown' if v == -2 else timedelta(v)
+intpriority = {'low': -1, 'normal': 0, 'high': 0}.get
+
+status = {
+        # modern values compatible with old api
+        0: 'stopped',
+        1: 'check pending',
+        2: 'checking',
+        3: 'download pending',
+        4: 'downloading',
+        5: 'seed pending',
+        6: 'seeding',
+
+        # deprecated api values
+        8:  'seeding',
+        16: 'stopped',
+        }.get
+
+icon = {
+        'stopped': 'pause',
+        'check pending': 'dashboard',
+        'checking': 'dashboard',
+        'download pending': 'download-alt',
+        'downloading': 'download-alt',
+        'seed pending': 'upload-alt',
+        'seeding': 'upload-alt',
+        }.get
+
 
 import re
 upcase_re = re.compile(r'([A-Z])')
@@ -34,13 +61,12 @@ class File(TorrentModel):
             }
 
     def _init(self):
-        self.progress = self.bytes_completed / self.length
-        self.progress_str = '%0.2f%%' % (self.progress * 100)
+        self.percent_done = self.bytes_completed / self.length
 
 class FileStat(TorrentModel):
     _casts = {
             #'bytesCompleted': int,
-            #'wanted': bool,
+            'wanted': bool,
             'priority': priority,
             }
 
@@ -122,7 +148,7 @@ class Torrent(TorrentModel):
             #'creator': str,
             'dateCreated': unixtime,
             #'desiredAvailable': int,
-            #'doneDate': int,
+            'doneDate': unixtime,
             #'downloadDir': str,
             #'downloadedEver': int,
             #'downloadLimit': int,
@@ -162,15 +188,15 @@ class Torrent(TorrentModel):
             #'rateDownload': int,
             #'rateUpload': int,
             #'recheckProgress': float,
-            #'secondsDownloading': int,
-            #'secondsSeeding': int,
+            'secondsDownloading': timedelta,
+            'secondsSeeding': timedelta,
             #'seedIdleLimit': int,
-            #'seedIdleMode': int,
+            'seedIdleMode': mode,
             #'seedRatioLimit': float,
-            #'seedRatioMode': int,
+            'seedRatioMode': mode,
             #'sizeWhenDone': int,
-            #'startDate': int,
-            #'status': int,
+            'startDate': unixtime,
+            'status': status,
             'trackers': listof(Tracker),
             'trackerStats': listof(TrackerStat),
             #'totalSize': int,
@@ -187,9 +213,15 @@ class Torrent(TorrentModel):
     def _init(self):
         if 'files' in self and 'file_stats' in self:
             for i, stats in enumerate(self.file_stats):
-                self.files[i].update(stats.__dict__)
+                self.files[i].update(stats.__dict__, id=i)
 
             self.files.sort(key=op.attrgetter('name'))
+
+        if 'left_until_done' in self and 'size_when_done' in self:
+            self.size_now = self.size_when_done - self.left_until_done
+
+        if 'status' in self:
+            self.icon = icon(self.status)
 
 class SessionStat(TorrentModel):
     pass

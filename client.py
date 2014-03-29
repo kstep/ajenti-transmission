@@ -1,4 +1,5 @@
-from ajenti.plugins.transmission.client.models import *
+from ajenti.plugins.transmission.models import *
+import operator as op
 import random
 import requests
 import json
@@ -20,7 +21,7 @@ class ProtocolError(TransmissionError):
     pass
 
 
-class Connection(object):
+class Client(object):
     _commands = {
             'torrent-start': None,
             'torrent-stop': None,
@@ -53,9 +54,17 @@ class Connection(object):
         if name not in self._commands:
             raise AttributeError(name)
 
-        method = (lambda self, **kwargs: self._do_request(name, kwargs)).__get__(self, self.__class__)
+        method = (lambda self, **kwargs: self._do_request(name, self._fix_arg_keys(kwargs))).__get__(self, self.__class__)
         setattr(self, name, method)
         return method
+
+    @staticmethod
+    def _fix_arg_keys(args):
+        for key, value in args.iteritems():
+            if '_' in key:
+                del args[key]
+                args[key.replace('_', '-')] = value
+        return args
 
     def _do_request(self, name, args):
         tag = self._tag.next()
@@ -88,4 +97,10 @@ class Connection(object):
 
         else:
             raise ProtocolError('unexpected status code %s' % result.status_code)
+
+    def start_all(self):
+        self.torrent_start(ids=map(op.attrgetter('id'), self.torrent_get(fields=['id'])))
+
+    def stop_all(self):
+        self.torrent_stop(ids=map(op.attrgetter('id'), self.torrent_get(fields=['id'])))
 

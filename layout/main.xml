@@ -1,11 +1,19 @@
 <body>
     <pad id="main">
-        <vc>
+
+        <right>
             <hc>
-                <button id="refresh" icon="refresh" text="{Refresh}" style="mini" />
-                <button id="add" text="{Add torrent}" icon="download-alt" style="mini" />
                 <button id="start_all" text="{Start all}" icon="play" style="mini" />
+                <button id="stop_all" text="{Stop all}" icon="stop" style="mini" />
             </hc>
+        </right>
+
+        <hc>
+            <button id="refresh" icon="refresh" text="{Refresh}" style="mini" />
+            <button id="add" text="{Add torrent}" icon="download-alt" style="mini" />
+        </hc>
+
+        <vc>
             <bind:collection bind="torrents" id="torrents">
                 <dt bind="__items">
                     <dtr>
@@ -23,35 +31,44 @@
                             <collapse>
                                 <label bind="name" style="bold" />
 
-                                <label style="small" bind="downloaded_ever" />
-                                <label style="small" text="/" />
-                                <label style="small" bind="size_when_done" />
+                                <lt>
+                                    <ltr>
+                                        <ltd>
+                                            <label style="small" bind="size_now__size" />
+                                            <label style="small" text="/" />
+                                            <label style="small" bind="size_when_done__size" />
+                                        </ltd>
 
-                                <label style="small" text=" (" />
-                                <label style="small" bind="total_size" />
-                                <label style="small" text="), " />
+                                        <ltd>
+                                            <label style="small" bind="total_size__size" />
+                                        </ltd>
 
-                                <label style="small" bind="time_left" />
-                                <label style="small" text=" left" />
+                                        <ltd>
+                                            <icon icon="time" />
+                                            <label style="small" bind="eta__string" />
+                                        </ltd>
+                                    </ltr>
+                                </lt>
                             </collapse>
                         </dtd>
                         <dtd>
                             <hc>
-                                <label bind="progress_str" style="mini" />
-                                <progressbar bind="percentDone" width="100" />
+                                <label bind="percent_done__percent" style="mini" />
+                                <progressbar bind="percent_done" width="100" />
                             </hc>
                         </dtd>
                         <dtd>
                             <hc>
-                                <tooltip text="Low priority"><togglebutton id="priority_low" bind:pressed="is_priority_low" icon="arrow-down" style="mini" /></tooltip>
-                                <tooltip text="Normal priority"><togglebutton id="priority_normal" bind:pressed="is_priority_normal" icon="minus" style="mini" /></tooltip>
-                                <tooltip text="High priority"><togglebutton id="priority_high" bind:pressed="is_priority_high" icon="arrow-up" style="mini" /></tooltip>
+                                <tooltip text="Low priority"><togglebutton id="priority_low" bind:pressed="is_bandwidth_priority_low" icon="arrow-down" style="mini" /></tooltip>
+                                <tooltip text="Normal priority"><togglebutton id="priority_normal" bind:pressed="is_bandwidth_priority_normal" icon="minus" style="mini" /></tooltip>
+                                <tooltip text="High priority"><togglebutton id="priority_high" bind:pressed="is_bandwidth_priority_high" icon="arrow-up" style="mini" /></tooltip>
                             </hc>
                         </dtd>
                         <dtd>
                             <hc>
-                                <tooltip text="Start"><button id="start" icon="play" style="mini" bind:visible="is_stopped" /></tooltip>
-                                <tooltip text="Stop"><button id="stop" icon="pause" style="mini" bind:visible="is_started" /></tooltip>
+                                <tooltip text="Start"><button id="start" icon="play" style="mini" bind:visible="is_status_stopped" /></tooltip>
+                                <tooltip text="Stop"><button id="stop" icon="pause" style="mini" bind:visible="isnt_status_stopped" /></tooltip>
+                                <tooltip text="Recheck"><button id="recheck" icon="repeat" bind:visible="isnt_status_checking" style="mini" /></tooltip>
                                 <tooltip text="Details"><button id="details" icon="info" style="mini" /></tooltip>
                                 <tooltip text="Remove"><button bind="__delete" icon="remove" style="mini" warning="Remove the torrent from list?" /></tooltip>
                             </hc>
@@ -60,26 +77,33 @@
                 </bind:template>
             </bind:collection>
 
-            <formgroup text="{Torrent info}" bind:visible="show_details">
+            <formgroup text="{Torrent info}" bind:visible="files__exists">
                 <vc>
                     <bind:dict bind="torrent" id="torrent">
                         <dt>
                             <dtr>
                                 <dth text="{Name}" width="120" />
-                                <dtd><label bind="name" /></dtd>
+                                <dtd>
+                                    <collapse>
+                                        <label bind="name" />
+                                        <textbox bind="torrent_file" readonly="True" style="big" />
+                                    </collapse>
+                                </dtd>
                                 <dth text="{Priority}" />
-                                <dtd><label bind="priority" /><label text=" (" /><label bind="bandwidthPriority" /><label text=")" /></dtd>
+                                <dtd><label bind="bandwidth_priority" /></dtd>
                             </dtr>
                             <dtr>
                                 <dth text="{Destionation}" />
-                                <dtd><label bind="downloadDir" /></dtd>
+                                <dtd>
+                                    <pathbox directory="True" style="big" bind="download_dir" />
+                                </dtd>
                                 <dth text="{Peers}" />
                                 <dtd>
                                     <lt>
                                         <ltr>
-                                            <ltd><icon icon="arrow-down" /><label bind="peersSendingToUs" /></ltd>
-                                            <ltd><icon icon="arrow-up" /><label bind="peersGettingFromUs" /></ltd>
-                                            <ltd><icon icon="exchange" /><label bind="peersConnected" /></ltd>
+                                            <ltd><icon icon="arrow-down" /><label bind="peers_sending_to_us" /></ltd>
+                                            <ltd><icon icon="arrow-up" /><label bind="peers_getting_from_us" /></ltd>
+                                            <ltd><icon icon="exchange" /><label bind="peers_connected" /></ltd>
                                         </ltr>
                                     </lt>
                                 </dtd>
@@ -89,9 +113,9 @@
                                 <dtd>
                                     <lt>
                                         <ltr>
-                                            <ltd><icon icon="arrow-down" /><label bind="rate_download" /></ltd>
-                                            <ltd><icon icon="arrow-up" /><label bind="rate_upload" /></ltd>
-                                            <ltd><icon icon="time" /><label bind="time_left" /></ltd>
+                                            <ltd><icon icon="arrow-down" /><label bind="rate_download__size" /></ltd>
+                                            <ltd><icon icon="arrow-up" /><label bind="rate_upload__size" /></ltd>
+                                            <ltd><icon icon="time" /><label bind="eta__timedelta" /></ltd>
                                         </ltr>
                                     </lt>
                                 </dtd>
@@ -99,8 +123,8 @@
                                 <dtd>
                                     <lt>
                                         <ltr>
-                                            <ltd><icon icon="arrow-down" /><label bind="seconds_downloading" /></ltd>
-                                            <ltd><icon icon="arrow-up" /><label bind="seconds_seeding" /></ltd>
+                                            <ltd><icon icon="arrow-down" /><label bind="seconds_downloading__timedelta" /></ltd>
+                                            <ltd><icon icon="arrow-up" /><label bind="seconds_seeding__timedelta" /></ltd>
                                         </ltr>
                                     </lt>
                                 </dtd>
@@ -110,17 +134,17 @@
                                 <dtd>
                                     <lt>
                                         <ltr>
-                                            <ltd><icon icon="arrow-down" /><label bind="downloaded_ever" /></ltd>
-                                            <ltd><icon icon="arrow-up" /><label bind="uploaded_ever" /></ltd>
-                                            <ltd><icon icon="exchange" /><label bind="uploadRatio" /></ltd>
+                                            <ltd><icon icon="arrow-down" /><label bind="downloaded_ever__size" /></ltd>
+                                            <ltd><icon icon="arrow-up" /><label bind="uploaded_ever__size" /></ltd>
+                                            <ltd><icon icon="exchange" /><label bind="upload_ratio" /></ltd>
                                         </ltr>
                                     </lt>
                                 </dtd>
                                 <dth text="{Size}" />
                                 <dtd>
-                                    <label bind="total_size" />
+                                    <label bind="total_size__size" />
                                     <label text=", selected " />
-                                    <label bind="size_when_done" />
+                                    <label bind="size_when_done__size" />
                                 </dtd>
                             </dtr>
                             <!--<dtr>
@@ -191,13 +215,13 @@
                         </dt>
                         <bind:template>
                             <dtr>
-                                <dtd><checkbox bind="selected" /></dtd>
+                                <dtd><checkbox bind="wanted" /></dtd>
                                 <dtd><label bind="name" /></dtd>
-                                <dtd><label bind="completed_str" /><label text=" / " /><label bind="size_str" /></dtd>
+                                <dtd><label bind="bytes_completed__size" /><label text=" / " /><label bind="length__size" /></dtd>
                                 <dtd>
                                     <hc>
-                                        <label bind="progress_str" style="mini" />
-                                        <progressbar bind="percentDone" width="100" />
+                                        <label bind="percent_done__percent" style="mini" />
+                                        <progressbar bind="percent_done" width="100" />
                                     </hc>
                                 </dtd>
                                 <dtd>
@@ -246,4 +270,5 @@
             </formgroup>
         </pad>
     </dialog>
+
 </body>
