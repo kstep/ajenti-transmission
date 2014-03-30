@@ -25,8 +25,8 @@ status = {
 
 icon = {
         'stopped': 'pause',
-        'check pending': 'dashboard',
-        'checking': 'dashboard',
+        'check pending': 'stethoscope',
+        'checking': 'stethoscope',
         'download pending': 'download-alt',
         'downloading': 'download-alt',
         'seed pending': 'upload-alt',

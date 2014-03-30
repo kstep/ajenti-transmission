@@ -34,12 +34,14 @@
                                 <lt>
                                     <ltr>
                                         <ltd>
+                                            <icon icon="signal" />
                                             <label style="small" bind="size_now__size" />
                                             <label style="small" text="/" />
                                             <label style="small" bind="size_when_done__size" />
                                         </ltd>
 
                                         <ltd>
+                                            <icon icon="hdd" />
                                             <label style="small" bind="total_size__size" />
                                         </ltd>
 
