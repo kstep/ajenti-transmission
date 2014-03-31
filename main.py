@@ -153,6 +153,8 @@ class TransmissionPlugin (SectionPlugin):
             'trackers',  # 'trackerStats',
             #'lastAnnounceTime', 'lastScrapeTime', 'announceURL', 'scrapeURL',
             #'announceResponse', 'scrapeResponse'
+            'honorsSessionLimits', 'peer-limit', 'downloadLimit', 'downloadLimited',
+            'seedRatioLimit', 'seedRationMode', 'uploadLimit', 'uploadLimited',
             ])[0]
 
         self.scope.trackers, self.scope.files, self.scope.peers, self.scope.pieces = (

@@ -81,156 +81,125 @@
 
             <formgroup text="{Torrent info}" bind:visible="torrent__truthy">
                 <vc>
-                    <bind:dict bind="torrent" id="torrent">
-                        <dt>
-                            <dtr>
-                                <dth text="{Name}" width="120" />
-                                <dtd>
-                                    <collapse>
-                                        <label bind="name" />
-                                        <textbox bind="torrent_file" readonly="True" style="big" />
-                                    </collapse>
-                                </dtd>
-                                <dth text="{Priority}" />
-                                <dtd><label bind="bandwidth_priority" /></dtd>
-                            </dtr>
-                            <dtr>
-                                <dth text="{Destionation}" />
-                                <dtd>
-                                    <hc>
-                                        <pathbox directory="True" style="big" bind="download_dir" id="download_dir" />
-                                        <tooltip text="{Move files}"><button style="mini" id="move" icon="ok" /></tooltip>
-                                    </hc>
-                                </dtd>
-                                <dth text="{Peers}" />
-                                <dtd>
-                                    <lt>
-                                        <ltr>
-                                            <ltd><icon icon="arrow-down" /><label bind="peers_sending_to_us" /></ltd>
-                                            <ltd><icon icon="arrow-up" /><label bind="peers_getting_from_us" /></ltd>
-                                            <ltd><icon icon="exchange" /><label bind="peers_connected" /></ltd>
-                                        </ltr>
-                                    </lt>
-                                </dtd>
-                            </dtr>
-                            <dtr>
-                                <dth text="{Speed}" />
-                                <dtd>
-                                    <lt>
-                                        <ltr>
-                                            <ltd><icon icon="arrow-down" /><label bind="rate_download__size" /></ltd>
-                                            <ltd><icon icon="arrow-up" /><label bind="rate_upload__size" /></ltd>
-                                            <ltd><icon icon="time" /><label bind="eta__str" /></ltd>
-                                        </ltr>
-                                    </lt>
-                                </dtd>
-                                <dth text="{Time}" />
-                                <dtd>
-                                    <lt>
-                                        <ltr>
-                                            <ltd><icon icon="arrow-down" /><label bind="seconds_downloading__str" /></ltd>
-                                            <ltd><icon icon="arrow-up" /><label bind="seconds_seeding__str" /></ltd>
-                                        </ltr>
-                                    </lt>
-                                </dtd>
-                            </dtr>
-                            <dtr>
-                                <dth text="{Volume}" />
-                                <dtd>
-                                    <lt>
-                                        <ltr>
-                                            <ltd><icon icon="arrow-down" /><label bind="downloaded_ever__size" /></ltd>
-                                            <ltd><icon icon="arrow-up" /><label bind="uploaded_ever__size" /></ltd>
-                                            <ltd><icon icon="exchange" /><label bind="upload_ratio" /></ltd>
-                                        </ltr>
-                                    </lt>
-                                </dtd>
-                                <dth text="{Size}" />
-                                <dtd>
-                                    <label bind="total_size__size" />
-                                    <label text=", selected " />
-                                    <label bind="size_when_done__size" />
-                                </dtd>
-                            </dtr>
-                            <dtr>
-                                <dth text="{Timestamps}" />
-                                <dtd>
-                                    <lt>
-                                        <ltr>
-                                            <ltd><label style="bold" text="{Created }" /><label bind="date_created__datetime" /></ltd>
-                                            <ltd><label style="bold" text="{Added }" /><label bind="added_date__datetime" /></ltd>
-                                        </ltr>
-                                    </lt>
-                                </dtd>
-                                <dth text="{Run date}" />
-                                <dtd>
-                                    <hc>
-                                        <label bind="start_date__datetime" /><label text=" — " /><label bind="done_date__datetime" />
-                                    </hc>
-                                </dtd>
-                            </dtr>
-                            <!--<dtr>
-                                <dth text="{Annoucement}" />
-                                <dtd>
-                                    <right><tooltip text="{Reannounce}"><button style="mini" icon="refresh" id="reannounce" /></tooltip></right>
-                                    <lt width="auto"><ltr>
-                                        <ltd><icon icon="link" /><label bind="announce_url" /></ltd>
-                                        <ltd><icon icon="repeat" /><label bind="announce_response" /></ltd>
-                                    </ltr></lt>
-                                </dtd>
-                                <dth />
-                                <dtd>
-                                    <hc><icon icon="time" /><label bind="last_announce_time__datetime" /></hc>
-                                </dtd>
-                            </dtr>
-                            <dtr>
-                                <dth text="{Scrape}" />
-                                <dtd>
-                                    <lt width="auto"><ltr>
-                                        <ltd><icon icon="link" /><label bind="scrape_url" /></ltd>
-                                        <ltd><icon icon="repeat" /><label bind="scrape_response" /></ltd>
-                                    </ltr></lt>
-                                </dtd>
-                                <dth />
-                                <dtd>
-                                    <hc><icon icon="time" /><label bind="last_scrape_time__datetime" /></hc>
-                                </dtd>
-                            </dtr>-->
-                        </dt>
-                        <!--<dt>
-                            <dtr>
-                                <dth text="{Limits}" />
-                                <dtd>
-                                    <formline text="{Use session limits}">
-                                        <checkbox bind="honors_session_limits" />
-                                    </formline>
-                                    <formline text="{Download speed}">
-                                        <checkbox bind="download_limited" />
-                                        <inputbox bind="download_limit" type="number" />
-                                        <dropdown values="[0,1,2]" labels="['Global','Torrent','Unlimited']" bind="download_limit_speed" />
-                                    </formline>
-                                    <formline text="{Upload speed}">
-                                        <checkbox bind="upload_limited" />
-                                        <inputbox bind="upload_limit" type="number" />
-                                        <dropdown values="[0,1,2]" labels="['Global','Torrent','Unlimited']" bind="uploadLimitSpeed" />
-                                    </formline>
-                                    <formline text="{Ratio}">
-                                        <inputbox bind="seedRatioLimit" type="number" />
-                                        <dropdown values="[0,1,2]" labels="['Global','Torrent','Unlimited']" bind="seedRatioMode" />
-                                    </formline>
-                                    <formline text="{Seed idle}">
-                                        <inputbox bind="seedIdleLimit" type="number" />
-                                        <dropdown values="[0,1,2]" labels="['Global','Torrent','Unlimited']" bind="seedIdleMode" />
-                                    </formline>
-                                    <formline text="{Peers}">
-                                        <inputbox bind="peer_limit" />
-                                    </formline>
-                                </dtd>
-                            </dtr>
-                        </dt>-->
-                    </bind:dict>
+                    
 
                     <tabs>
+                        <tab title="{Info}">
+                            <bind:dict bind="torrent" id="torrent">
+                                <dt>
+                                    <dtr>
+                                        <dth text="{Name}" width="120" />
+                                        <dtd>
+                                            <collapse>
+                                                <label bind="name" />
+                                                <textbox bind="torrent_file" readonly="True" style="big" />
+                                            </collapse>
+                                        </dtd>
+                                        <dth text="{Priority}" />
+                                        <dtd><label bind="bandwidth_priority" /></dtd>
+                                    </dtr>
+                                    <dtr>
+                                        <dth text="{Destionation}" />
+                                        <dtd>
+                                            <hc>
+                                                <pathbox directory="True" style="big" bind="download_dir" id="download_dir" />
+                                                <tooltip text="{Move files}"><button style="mini" id="move" icon="ok" /></tooltip>
+                                            </hc>
+                                        </dtd>
+                                        <dth text="{Peers}" />
+                                        <dtd>
+                                            <lt>
+                                                <ltr>
+                                                    <ltd><icon icon="arrow-down" /><label bind="peers_sending_to_us" /></ltd>
+                                                    <ltd><icon icon="arrow-up" /><label bind="peers_getting_from_us" /></ltd>
+                                                    <ltd><icon icon="exchange" /><label bind="peers_connected" /></ltd>
+                                                </ltr>
+                                            </lt>
+                                        </dtd>
+                                    </dtr>
+                                    <dtr>
+                                        <dth text="{Speed}" />
+                                        <dtd>
+                                            <lt>
+                                                <ltr>
+                                                    <ltd><icon icon="arrow-down" /><label bind="rate_download__size" /></ltd>
+                                                    <ltd><icon icon="arrow-up" /><label bind="rate_upload__size" /></ltd>
+                                                    <ltd><icon icon="time" /><label bind="eta__str" /></ltd>
+                                                </ltr>
+                                            </lt>
+                                        </dtd>
+                                        <dth text="{Time}" />
+                                        <dtd>
+                                            <lt>
+                                                <ltr>
+                                                    <ltd><icon icon="arrow-down" /><label bind="seconds_downloading__str" /></ltd>
+                                                    <ltd><icon icon="arrow-up" /><label bind="seconds_seeding__str" /></ltd>
+                                                </ltr>
+                                            </lt>
+                                        </dtd>
+                                    </dtr>
+                                    <dtr>
+                                        <dth text="{Volume}" />
+                                        <dtd>
+                                            <lt>
+                                                <ltr>
+                                                    <ltd><icon icon="arrow-down" /><label bind="downloaded_ever__size" /></ltd>
+                                                    <ltd><icon icon="arrow-up" /><label bind="uploaded_ever__size" /></ltd>
+                                                    <ltd><icon icon="exchange" /><label bind="upload_ratio" /></ltd>
+                                                </ltr>
+                                            </lt>
+                                        </dtd>
+                                        <dth text="{Size}" />
+                                        <dtd>
+                                            <label bind="total_size__size" />
+                                            <label text=", selected " />
+                                            <label bind="size_when_done__size" />
+                                        </dtd>
+                                    </dtr>
+                                    <dtr>
+                                        <dth text="{Timestamps}" />
+                                        <dtd>
+                                            <lt>
+                                                <ltr>
+                                                    <ltd><label style="bold" text="{Created }" /><label bind="date_created__datetime" /></ltd>
+                                                    <ltd><label style="bold" text="{Added }" /><label bind="added_date__datetime" /></ltd>
+                                                </ltr>
+                                            </lt>
+                                        </dtd>
+                                        <dth text="{Run date}" />
+                                        <dtd>
+                                            <hc>
+                                                <label bind="start_date__datetime" /><label text=" — " /><label bind="done_date__datetime" />
+                                            </hc>
+                                        </dtd>
+                                    </dtr>
+                                </dt>
+                            </bind:dict>
+                        </tab>
+
+                        <tab title="{Limits}">
+                            <bind:dict bind="torrent">
+                                <formline text="{Download limits}">
+                                    <textbox bind="download_limit" type="number" />
+                                    <checkbox bind="download_limited" text="{Active}" />
+                                </formline>
+                                <formline text="{Upload limits}">
+                                    <textbox bind="upload_limit" type="number" />
+                                    <checkbox bind="upload_limited" text="{Active}" />
+                                </formline>
+                                <formline text="{Ratio limits}">
+                                    <textbox bind="seed_ratio_limit" type="number" />
+                                    <dropdown values="['global', 'single', 'limited']" labels="['Global', 'Single', 'Limited']" bind="seed_ratio_mode" />
+                                </formline>
+                                <formline text="{Global limits}">
+                                    <checkbox bind="honors_session_limits" text="{Honor session limits}" />
+                                </formline>
+                                <formline>
+                                    <button id="apply_limits" text="{Apply changes}" icon="ok" />
+                                </formline>
+                            </bind:dict>
+                        </tab>
+
                         <tab title="{Files}">
                             <bind:collection bind="files" id="files">
                                 <button id="apply" icon="ok" text="{Apply changes}" />
