@@ -202,7 +202,7 @@
 
                         <tab title="{Files}">
                             <bind:collection bind="files" id="files">
-                                <button id="apply" icon="ok" text="{Apply changes}" />
+                                <button id="apply_files" icon="ok" text="{Apply changes}" />
 
                                 <dt bind="__items">
                                     <dtr>

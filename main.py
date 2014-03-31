@@ -62,8 +62,23 @@ class TransmissionPlugin (SectionPlugin):
         self._client = Client()
         self.refresh()
 
-    @on('apply', 'click')
-    def apply(self):
+    @on('apply_limits', 'click')
+    def apply_limits(self):
+        self.binder.update()
+
+        self._client.torrent_set(ids=[self.scope.torrent.id],
+                downloadLimit=self.scope.torrent.download_limit,
+                downloadLimited=self.scope.torrent.download_limited,
+                uploadLimit=self.scope.torrent.upload_limit,
+                uploadLimited=self.scope.torrent.upload_limited,
+                seedRatioLimit=self.scope.torrent.seed_ratio_limit,
+                seedRatioMode={'global': 0, 'single': 1, 'unlimited': 2}.get(self.scope.torrent.seed_ratio_mode),
+                honorsSessionLimits=self.scope.torrent.honors_session_limits)
+
+        self.refresh()
+
+    @on('apply_files', 'click')
+    def apply_files(self):
         self.binder.update()
 
         files_wanted, files_unwanted = [], []
