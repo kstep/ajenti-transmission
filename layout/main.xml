@@ -11,6 +11,7 @@
         <hc>
             <button id="refresh" icon="refresh" text="{Refresh}" style="mini" />
             <button id="add" text="{Add torrent}" icon="download-alt" style="mini" />
+            <button id="config" text="{Session config}" icon="cogs" style="mini" />
         </hc>
 
         <vc>
@@ -328,7 +329,7 @@
         {'id': 'cancel', 'text': _('Cancel')}
         ]">
         <pad>
-            <formgroup text="Add new torrent">
+            <formgroup text="{Add new torrent}">
                 <vc>
                     <formline text="{URL}">
                         <textbox id="url" />
@@ -342,13 +343,111 @@
                 </vc>
             </formgroup>
 
-            <formgroup text="Download options">
+            <formgroup text="{Download options}">
                 <vc>
                     <formline text="{Download to}">
                         <pathbox id="target_dir" directory="True" />
                     </formline>
                     <formline>
                         <checkbox text="{Pause on add}" id="add_paused" value="True" />
+                    </formline>
+                </vc>
+            </formgroup>
+        </pad>
+    </dialog>
+
+    <dialog visible="False" id="session_dialog" buttons="[
+        {'id': 'apply', 'text': _('Apply')},
+        {'id': 'cancel', 'text': _('Cancel')}
+        ]">
+        <pad>
+            <formgroup text="{Storage options}">
+                <vc>
+                    <formline text="{Download directory}">
+                        <pathbox directory="True" bind="download_dir" />
+                    </formline>
+                </vc>
+            </formgroup>
+
+            <formgroup text="{Global limits}">
+                <vc>
+                    <formline text="{Download speed}">
+                        <textbox type="number" bind="speed_limit_down" />
+                        <checkbox text="{Active}" bind="speed_limit_down_enabled" />
+                    </formline>
+                    <formline text="{Upload speed}">
+                        <textbox type="number" bind="speed_limit_up" />
+                        <checkbox text="{Active}" bind="speed_limit_up_enabled" />
+                    </formline>
+                    <formline text="{Ratio}">
+                        <textbox type="number" bind="seed_ratio_limit" />
+                        <checkbox text="{Active}" bind="seed_ratio_limited" />
+                    </formline>
+                </vc>
+            </formgroup>
+
+            <formgroup text="{Alternate limits}">
+                <vc>
+                    <formline text="{Download speed}">
+                        <textbox type="number" bind="alt_speed_down" />
+                    </formline>
+                    <formline text="{Upload speed}">
+                        <textbox type="number" bind="alt_speed_up" />
+                    </formline>
+                    <formline text="{Enabled}">
+                        <checkbox text="{Active}" bind="alt_speed_enabled" />
+                    </formline>
+                </vc>
+            </formgroup>
+
+            <formgroup text="{Alternate limits schedule}">
+                <vc>
+                    <formline text="{Start time}">
+                        <textbox type="number" bind="alt_speed_time_begin" />
+                    </formline>
+                    <formline text="{End time}">
+                        <textbox type="number" bind="alt_speed_time_end" />
+                    </formline>
+                    <formline text="{Days}">
+                        <textbox type="number" bind="alt_speed_time_day" />
+                    </formline>
+                    <formline text="{Enabled}">
+                        <checkbox text="{Active}" bind="alt_speed_time_enabled" />
+                    </formline>
+                </vc>
+            </formgroup>
+
+            <formgroup text="{Peer limits}">
+                <vc>
+                    <formline text="{Maximum peers}">
+                        <textbox type="number" bind="peer_limit_global" />
+                    </formline>
+                    <formline text="{Max peers per torrent}">
+                        <textbox type="number" bind="peer_limit_per_torrent" />
+                    </formline>
+                </vc>
+            </formgroup>
+
+            <formgroup text="{Connection options}">
+                <vc>
+                    <formline text="{Use blocklist}">
+                        <checkbox text="{Active}" bind="blocklist_enabled" />
+                    </formline>
+                    <formline text="{DHT enabled}">
+                        <checkbox text="{Active}" bind="dht_enabled" />
+                    </formline>
+                    <formline text="{PeX enabled}">
+                        <checkbox text="{Active}" bind="pex_enabled" />
+                    </formline>
+                    <formline text="{Encryption}">
+                        <dropdown values="['required', 'preferred', 'tolerated']" labels="['Required', 'Preferred', 'Tolerated']" bind="encryption" />
+                    </formline>
+                    <formline text="{Peer port}">
+                        <textbox type="number" bind="peer_port" />
+                        <checkbox text="{Randomize on start}" bind="peer_port_random_on_start" />
+                    </formline>
+                    <formline text="{Port forwarding}">
+                        <checkbox text="{Active}" bind="port_forwarding_enabled" />
                     </formline>
                 </vc>
             </formgroup>

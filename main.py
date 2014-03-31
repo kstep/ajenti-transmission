@@ -8,7 +8,7 @@ from ajenti.ui.binder import Binder
 from ajenti.ui import on
 from ajenti.util import str_fsize, str_timedelta
 from ajenti.plugins.transmission.client import Client
-from ajenti.plugins.transmission.models import Torrent
+from ajenti.plugins.transmission.models import Torrent, Session
 from ajenti.plugins.models.api import Model
 from datetime import datetime
 import time
@@ -56,10 +56,14 @@ class TransmissionPlugin (SectionPlugin):
 
         self.find('add_dialog').find('target_dir').value = os.path.expanduser('~transmission/Downloads')
 
-        self.binder = Binder(self.scope, self.find('main'))
-
     def on_first_page_load(self):
         self._client = Client()
+
+        self.session = self._client.session_get()
+        self.session_binder = Binder(self.session, self.find('session_dialog'))
+
+        self.binder = Binder(self.scope, self.find('main'))
+
         self.refresh()
 
     @on('apply_limits', 'click')
@@ -195,6 +199,45 @@ class TransmissionPlugin (SectionPlugin):
     #@on('reannounce', 'click')
     def reannounce(self):
         self._client.torrent_reannounce(ids=[self.scope.torrent.id])
+
+    @on('config', 'click')
+    def open_config_dialog(self):
+        self.session.update(self._client.session_get().__dict__)
+        self.session_binder.populate()
+        self.find('session_dialog').visible = True
+
+    @on('session_dialog', 'button')
+    def submit_config_dialog(self, button):
+        dialog = self.find('session_dialog')
+        dialog.visible = False
+
+        if button == 'apply':
+            self.session_binder.update()
+            self._client.session_set(
+                    alt_speed_down=self.session.alt_speed_down,
+                    alt_speed_up=self.session.alt_speed_up,
+                    alt_speed_enabled=self.session.alt_speed_enabled,
+                    alt_speed_time_begin=self.session.alt_speed_time_begin,
+                    alt_speed_time_end=self.session.alt_speed_time_end,
+                    alt_speed_time_day=self.session.alt_speed_time_day,
+                    dht_enabled=self.session.dht_enabled,
+                    pex_enabled=self.session.pex_enabled,
+                    encryption=self.session.encryption,
+                    download_dir=self.session.download_dir,
+
+                    peer_limit_global=self.session.peer_limit_global,
+                    peer_limit_per_torrent=self.session.peer_limit_per_torrent,
+                    peer_port=self.session.peer_port,
+                    peer_port_random_on_start=self.session.peer_port_random_on_start,
+                    port_forwarding_enabled=self.session.port_forwarding_enabled,
+
+                    seedRatioLimit=self.session.seed_ratio_limit,
+                    seedRatioLimited=self.session.seed_ratio_limited,
+                    speed_limit_down=self.session.speed_limit_down,
+                    speed_limit_up=self.session.speed_limit_up,
+                    speed_limit_down_enabled=self.session.speed_limit_down_enabled,
+                    speed_limit_up_enabled=self.session.speed_limit_up_enabled,
+                    )
 
     @on('add', 'click')
     def open_add_dialog(self):
