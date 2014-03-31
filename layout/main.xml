@@ -97,7 +97,10 @@
                             <dtr>
                                 <dth text="{Destionation}" />
                                 <dtd>
-                                    <pathbox directory="True" style="big" bind="download_dir" />
+                                    <hc>
+                                        <pathbox directory="True" style="big" bind="download_dir" id="download_dir" />
+                                        <tooltip text="{Move files}"><button style="mini" id="move" icon="ok" /></tooltip>
+                                    </hc>
                                 </dtd>
                                 <dth text="{Peers}" />
                                 <dtd>
@@ -149,42 +152,66 @@
                                     <label bind="size_when_done__size" />
                                 </dtd>
                             </dtr>
+                            <dtr>
+                                <dth text="{Timestamps}" />
+                                <dtd>
+                                    <lt>
+                                        <ltr>
+                                            <ltd><label style="bold" text="{Created }" /><label bind="date_created__datetime" /></ltd>
+                                            <ltd><label style="bold" text="{Added }" /><label bind="added_date__datetime" /></ltd>
+                                        </ltr>
+                                    </lt>
+                                </dtd>
+                                <dth text="{Run date}" />
+                                <dtd>
+                                    <hc>
+                                        <label bind="start_date__datetime" /><label text=" — " /><label bind="done_date__datetime" />
+                                    </hc>
+                                </dtd>
+                            </dtr>
                             <!--<dtr>
                                 <dth text="{Annoucement}" />
                                 <dtd>
-                                    <lt>
-                                        <ltr>
-                                            <ltd><icon icon="link" /><label bind="announceURL" /></ltd>
-                                        </ltr>
-                                        <ltr>
-                                            <ltd><icon icon="repeat" /><label bind="announceResponse" /></ltd>
-                                        </ltr>
-                                    </lt>
+                                    <right><tooltip text="{Reannounce}"><button style="mini" icon="refresh" id="reannounce" /></tooltip></right>
+                                    <lt width="auto"><ltr>
+                                        <ltd><icon icon="link" /><label bind="announce_url" /></ltd>
+                                        <ltd><icon icon="repeat" /><label bind="announce_response" /></ltd>
+                                    </ltr></lt>
                                 </dtd>
                                 <dth />
                                 <dtd>
-                                    <lt>
-                                        <ltr>
-                                            <ltd><icon icon="arrow-down" /><label bind="last_scrape_time" /></ltd>
-                                            <ltd><icon icon="arrow-up" /><label bind="last_announce_time" /></ltd>
-                                        </ltr>
-                                    </lt>
+                                    <hc><icon icon="time" /><label bind="last_announce_time__datetime" /></hc>
+                                </dtd>
+                            </dtr>
+                            <dtr>
+                                <dth text="{Scrape}" />
+                                <dtd>
+                                    <lt width="auto"><ltr>
+                                        <ltd><icon icon="link" /><label bind="scrape_url" /></ltd>
+                                        <ltd><icon icon="repeat" /><label bind="scrape_response" /></ltd>
+                                    </ltr></lt>
+                                </dtd>
+                                <dth />
+                                <dtd>
+                                    <hc><icon icon="time" /><label bind="last_scrape_time__datetime" /></hc>
                                 </dtd>
                             </dtr>-->
-                            <!--<dtr>
+                        </dt>
+                        <!--<dt>
+                            <dtr>
                                 <dth text="{Limits}" />
                                 <dtd>
                                     <formline text="{Use session limits}">
-                                        <checkbox bind="honorsSessionLimits" />
+                                        <checkbox bind="honors_session_limits" />
                                     </formline>
                                     <formline text="{Download speed}">
-                                        <checkbox bind="downloadLimited" />
-                                        <inputbox bind="downloadLimit" type="number" />
-                                        <dropdown values="[0,1,2]" labels="['Global','Torrent','Unlimited']" bind="downloadLimitSpeed" />
+                                        <checkbox bind="download_limited" />
+                                        <inputbox bind="download_limit" type="number" />
+                                        <dropdown values="[0,1,2]" labels="['Global','Torrent','Unlimited']" bind="download_limit_speed" />
                                     </formline>
                                     <formline text="{Upload speed}">
-                                        <checkbox bind="uploadLimited" />
-                                        <inputbox bind="uploadLimit" type="number" />
+                                        <checkbox bind="upload_limited" />
+                                        <inputbox bind="upload_limit" type="number" />
                                         <dropdown values="[0,1,2]" labels="['Global','Torrent','Unlimited']" bind="uploadLimitSpeed" />
                                     </formline>
                                     <formline text="{Ratio}">
@@ -199,8 +226,8 @@
                                         <inputbox bind="peer_limit" />
                                     </formline>
                                 </dtd>
-                            </dtr>-->
-                        </dt>
+                            </dtr>
+                        </dt>-->
                     </bind:dict>
 
                     <tabs>
@@ -285,6 +312,34 @@
                                                 <progressbar bind="progress" width="100" />
                                             </hc>
                                         </dtd>
+                                    </dtr>
+                                </bind:template>
+                            </bind:collection>
+                        </tab>
+
+                        <tab title="{Trackers}">
+                            <bind:collection bind="trackers" id="trackers">
+                                <dt bind="__items">
+                                    <dtr>
+                                        <dth width="1%" />
+                                        <dth text="{Announce / scrape}" />
+                                        <dth text="{Tier}" />
+                                    </dtr>
+                                </dt>
+                                <bind:template>
+                                    <dtr>
+                                        <dtd><icon icon="link" /></dtd>
+                                        <dtd>
+                                            <lt>
+                                                <ltr>
+                                                    <ltd><icon icon="arrow-up" /></ltd><ltd><label bind="announce" /></ltd>
+                                                </ltr>
+                                                <ltr>
+                                                    <ltd><icon icon="arrow-down" /></ltd><ltd><label bind="scrape" /></ltd>
+                                                </ltr>
+                                            </lt>
+                                        </dtd>
+                                        <dtd><label bind="tier" /></dtd>
                                     </dtr>
                                 </bind:template>
                             </bind:collection>

@@ -31,6 +31,7 @@ class TransmissionPlugin (SectionPlugin):
                 torrent=Torrent.EMPTY,
                 peers=[],
                 pieces=[],
+                trackers=[],
                 files=[])
 
         def post_item_bind(root, collection, value, ui):
@@ -136,9 +137,15 @@ class TransmissionPlugin (SectionPlugin):
             'peersSendingToUs', 'peersGettingFromUs', 'peersConnected',
             'bandwidthPriority', 'secondsDownloading', 'secondsSeeding',
             'downloadedEver', 'uploadedEver', 'uploadRatio', 'peers', 'pieces', 'pieceCount',
-            'sizeWhenDone', 'totalSize', 'eta', 'rateUpload', 'rateDownload'])[0]
+            'sizeWhenDone', 'totalSize', 'eta', 'rateUpload', 'rateDownload',
+            'addedDate', 'dateCreated', 'startDate', 'doneDate',
+            'trackers',  # 'trackerStats',
+            #'lastAnnounceTime', 'lastScrapeTime', 'announceURL', 'scrapeURL',
+            #'announceResponse', 'scrapeResponse'
+            ])[0]
 
-        self.scope.files, self.scope.peers, self.scope.pieces = (
+        self.scope.trackers, self.scope.files, self.scope.peers, self.scope.pieces = (
+                self.scope.torrent.trackers,
                 self.scope.torrent.files,
                 self.scope.torrent.peers,
                 self.scope.torrent.pieces)
@@ -150,6 +157,10 @@ class TransmissionPlugin (SectionPlugin):
 
     def delete(self, item, collection):
         self._client.torrent_remove(ids=[item.id], delete_local_data=True)
+
+    #@on('reannounce', 'click')
+    def reannounce(self):
+        self._client.torrent_reannounce(ids=[self.scope.torrent.id])
 
     @on('add', 'click')
     def open_add_dialog(self):
@@ -197,15 +208,11 @@ class TransmissionPlugin (SectionPlugin):
             self.details(added_torrent)
             self.refresh()
 
-    @on('move_dialog', 'button')
-    def submit_move_dialog(self, button):
-        dialog = self.find('move_dialog')
-        dialog.visible = False
-
-        if button == 'move':
-            self._client.torrent_set_location(ids=[self.scope.torrent.id],
-                    location=dialog.find('target_dir').value, move=True)
-            self.refresh_item(self.scope.torrent)
+    @on('move', 'click')
+    def move(self):
+        self._client.torrent_set_location(ids=[self.scope.torrent.id],
+                location=self.find('download_dir').value, move=True)
+        self.refresh_item(self.scope.torrent)
 
 
 @plugin
