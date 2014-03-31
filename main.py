@@ -110,7 +110,11 @@ class TransmissionPlugin (SectionPlugin):
     @on('refresh', 'click')
     def refresh(self):
         self.scope.torrents = self._client.torrent_get(fields=['id', 'name', 'sizeWhenDone', 'leftUntilDone',
-            'percentDone', 'bandwidthPriority', 'totalSize', 'eta', 'status'])
+            'percentDone', 'bandwidthPriority', 'totalSize', 'eta', 'status', 'error', 'errorString'])
+
+        for t in self.scope.torrents:
+            if t.error:
+                self.context.notify('error', t.errorString)
 
         if self.scope.torrent:
             self.refresh_item(self.scope.torrent)
@@ -120,7 +124,9 @@ class TransmissionPlugin (SectionPlugin):
     def refresh_item(self, item):
         try:
             item.update(self._client.torrent_get(ids=[item.id], fields=['id', 'name', 'sizeWhenDone', 'leftUntilDone',
-                'percentDone', 'bandwidthPriority', 'totalSize', 'eta', 'status'])[0].__dict__)
+                'percentDone', 'bandwidthPriority', 'totalSize', 'eta', 'status', 'error', 'errorString'])[0].__dict__)
+            if item.error:
+                self.context.notify('error', item.errorString)
             self.binder.populate()
 
         except IndexError:
