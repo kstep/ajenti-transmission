@@ -8,6 +8,7 @@ from ajenti.ui.binder import Binder
 from ajenti.ui import on
 from ajenti.util import str_fsize, str_timedelta
 from ajenti.plugins.transmission.client import Client
+from ajenti.plugins.transmission.models import Torrent
 from ajenti.plugins.models.api import Model
 from datetime import datetime
 import time
@@ -27,7 +28,9 @@ class TransmissionPlugin (SectionPlugin):
 
         self.scope = Model(
                 torrents=[],
-                torrent={},
+                torrent=Torrent.EMPTY,
+                peers=[],
+                pieces=[],
                 files=[])
 
         def post_item_bind(root, collection, value, ui):
@@ -88,9 +91,13 @@ class TransmissionPlugin (SectionPlugin):
             self.binder.populate()
 
     def refresh_item(self, item):
-        item.update(self._client.torrent_get(ids=[item.id], fields=['id', 'name', 'sizeWhenDone', 'leftUntilDone',
-            'percentDone', 'bandwidthPriority', 'totalSize', 'eta', 'status'])[0].__dict__)
-        self.binder.populate()
+        try:
+            item.update(self._client.torrent_get(ids=[item.id], fields=['id', 'name', 'sizeWhenDone', 'leftUntilDone',
+                'percentDone', 'bandwidthPriority', 'totalSize', 'eta', 'status'])[0].__dict__)
+            self.binder.populate()
+
+        except IndexError:
+            pass
 
     def set_priority(self, item, value):
         self._client.torrent_set(ids=[item.id], bandwidthPriority=value)
@@ -128,9 +135,14 @@ class TransmissionPlugin (SectionPlugin):
             'id', 'files', 'fileStats', 'name', 'torrentFile', 'downloadDir',
             'peersSendingToUs', 'peersGettingFromUs', 'peersConnected',
             'bandwidthPriority', 'secondsDownloading', 'secondsSeeding',
-            'downloadedEver', 'uploadedEver', 'uploadRatio',
+            'downloadedEver', 'uploadedEver', 'uploadRatio', 'peers', 'pieces', 'pieceCount',
             'sizeWhenDone', 'totalSize', 'eta', 'rateUpload', 'rateDownload'])[0]
-        self.scope.files = self.scope.torrent.files
+
+        self.scope.files, self.scope.peers, self.scope.pieces = (
+                self.scope.torrent.files,
+                self.scope.torrent.peers,
+                self.scope.torrent.pieces)
+
         self.binder.populate()
 
     def remove(self, item, collection):

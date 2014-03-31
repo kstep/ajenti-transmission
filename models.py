@@ -1,6 +1,8 @@
+# -*- encoding: utf-8 -*-
 from __future__ import division
 from ajenti.plugins.models.api import Model, unixtime, listof, sort, timedelta
 import operator as op
+import itertools as it
 import base64
 
 priority = {-1: 'low', 0: 'normal', 1: 'high'}.get
@@ -39,6 +41,62 @@ upcase_re = re.compile(r'([A-Z])')
 
 
 # Transmission RPC API: https://trac.transmissionbt.com/browser/branches/1.7x/doc/rpc-spec.txt
+
+
+class bitfield(object):
+    __slots__ = ('value',)
+
+    def __init__(self, value, length=None):
+        if type(value) is not bytearray:
+            raise TypeError('bytearray expected, got %s' % type(value).__name__)
+
+        self.value = value
+
+    def __len__(self):
+        return len(self.value) * 8
+
+    @staticmethod
+    def bitcount(byte):
+        byte = (byte & (0x55)) + ((byte >> 1) & (0x55));
+        byte = (byte & (0x33)) + ((byte >> 2) & (0x33));
+        byte = (byte & (0x0f)) + ((byte >> 4) & (0x0f));
+        return byte
+
+    def count(self, value):
+        ones = sum(it.imap(self.bitcount, self.value))
+        return ones if value else len(self) - ones
+
+    def __getitem__(self, bitn):
+        place = bitn >> 3  # quick bitn // 8
+        bitn &= 7  # quick bitn % 8
+        return bit.one if self.value[place] & (0b10000000 >> bitn) else bit.zero
+
+    def __setitem__(self, bitn, value):
+        place = bitn >> 3
+        bitn = 0b10000000 >> (bitn & 7)
+        if value:
+            self.value[place] |= bitn
+        else:
+            self.value[place] &= ~bitn
+
+    def __delitem__(self, bitn):
+        place = bitn >> 3
+        bitn &= 7
+        self.value[place] &= ~(0b10000000 >> bitn)
+
+    def __repr__(self):
+        return '<bits:[%s]>' % ' '.join(it.imap(lambda n: ('0000000' + bin(n)[2:])[-8:], self.value))
+
+    def __iter__(self):
+        for byte in self.value:
+            m = 0b10000000
+            while m:
+                yield 1 if byte & m else 0
+                m >>= 1
+
+    def __str__(self):
+        return ''.join('■' if b else '□' for b in self)
+
 
 class TorrentModel(Model):
     _backmap = {}
@@ -180,7 +238,7 @@ class Torrent(TorrentModel):
             #'peersGettingFromUs': int,
             #'peersSendingToUs': int,
             #'percentDone': float,
-            'pieces': base64.decodestring,
+            'pieces': lambda v: bitfield(bytearray(base64.decodestring(v))),
             #'pieceCount': int,
             #'pieceSize': int,
             'priorities': listof(priority),
@@ -208,6 +266,12 @@ class Torrent(TorrentModel):
             #'wanted': listof(bool),
             #'webseeds': listof(str),
             #'webseedsSendingToUs': int,
+            }
+
+    _defaults = {
+            'files': [],
+            'peers': [],
+            'id': None,
             }
 
     def _init(self):

@@ -79,7 +79,7 @@
                 </bind:template>
             </bind:collection>
 
-            <formgroup text="{Torrent info}" bind:visible="files__truthy">
+            <formgroup text="{Torrent info}" bind:visible="torrent__truthy">
                 <vc>
                     <bind:dict bind="torrent" id="torrent">
                         <dt>
@@ -203,39 +203,97 @@
                         </dt>
                     </bind:dict>
 
-                    <bind:collection bind="files" id="files">
-                        <button id="apply" icon="ok" text="{Apply changes}" />
+                    <tabs>
+                        <tab title="{Files}">
+                            <bind:collection bind="files" id="files">
+                                <button id="apply" icon="ok" text="{Apply changes}" />
 
-                        <dt bind="__items">
-                            <dtr>
-                                <dth width="1%" />
-                                <dth text="{Name}" />
-                                <dth text="{Size}" />
-                                <dth text="{Progress}" />
-                                <dth width="60" text="{Priority}" />
-                            </dtr>
-                        </dt>
-                        <bind:template>
-                            <dtr>
-                                <dtd><checkbox bind="wanted" /></dtd>
-                                <dtd><label bind="name" /></dtd>
-                                <dtd><label bind="bytes_completed__size" /><label text=" / " /><label bind="length__size" /></dtd>
-                                <dtd>
-                                    <hc>
-                                        <label bind="percent_done__percent" style="mini" />
-                                        <progressbar bind="percent_done" width="100" />
-                                    </hc>
-                                </dtd>
-                                <dtd>
-                                    <hc>
-                                        <tooltip text="Low priority"><togglebutton id="priority_low" bind:pressed="is_priority_low" icon="arrow-down" style="mini" /></tooltip>
-                                        <tooltip text="Normal priority"><togglebutton id="priority_normal" bind:pressed="is_priority_normal" icon="minus" style="mini" /></tooltip>
-                                        <tooltip text="High priority"><togglebutton id="priority_high" bind:pressed="is_priority_high" icon="arrow-up" style="mini" /></tooltip>
-                                    </hc>
-                                </dtd>
-                            </dtr>
-                        </bind:template>
-                    </bind:collection>
+                                <dt bind="__items">
+                                    <dtr>
+                                        <dth width="1%" />
+                                        <dth text="{Name}" />
+                                        <dth text="{Size}" />
+                                        <dth text="{Progress}" />
+                                        <dth width="60" text="{Priority}" />
+                                    </dtr>
+                                </dt>
+                                <bind:template>
+                                    <dtr>
+                                        <dtd><checkbox bind="wanted" /></dtd>
+                                        <dtd><label bind="name" /></dtd>
+                                        <dtd><label bind="bytes_completed__size" /><label text=" / " /><label bind="length__size" /></dtd>
+                                        <dtd>
+                                            <hc>
+                                                <label bind="percent_done__percent" style="mini" />
+                                                <progressbar bind="percent_done" width="100" />
+                                            </hc>
+                                        </dtd>
+                                        <dtd>
+                                            <hc>
+                                                <tooltip text="Low priority"><togglebutton id="priority_low" bind:pressed="is_priority_low" icon="arrow-down" style="mini" /></tooltip>
+                                                <tooltip text="Normal priority"><togglebutton id="priority_normal" bind:pressed="is_priority_normal" icon="minus" style="mini" /></tooltip>
+                                                <tooltip text="High priority"><togglebutton id="priority_high" bind:pressed="is_priority_high" icon="arrow-up" style="mini" /></tooltip>
+                                            </hc>
+                                        </dtd>
+                                    </dtr>
+                                </bind:template>
+                            </bind:collection>
+                        </tab>
+
+                        <tab title="{Peers}">
+                            <bind:collection bind="peers" id="peers">
+                                <dt bind="__items">
+                                    <dtr>
+                                        <dth width="1%" />
+                                        <dth text="{Client}" />
+                                        <dth width="120" text="{Address}" />
+                                        <dth width="180" text="{Speed}" />
+                                        <dth width="150" text="{Progress}" />
+                                    </dtr>
+                                </dt>
+                                <bind:template>
+                                    <dtr>
+                                        <dtd>
+                                            <hc>
+                                                <tooltip text="{I'm choked}"><icon icon="pause" bind:visible="client_is_choked" /></tooltip>
+                                                <tooltip text="{Peer is choked}"><icon icon="stop" bind:visible="peer_is_choked" /></tooltip>
+                                                <tooltip text="{I'm interested}"><icon icon="circle-arrow-down" bind:visible="client_is_interesed" /></tooltip>
+                                                <tooltip text="{Peer is interested}"><icon icon="circle-arrow-up" bind:visible="peer_is_interesed" /></tooltip>
+                                                <tooltip text="{Downloading}"><icon icon="download-alt" bind:visible="is_downloading_from" /></tooltip>
+                                                <tooltip text="{Uploading}"><icon icon="upload-alt" bind:visible="is_uploading_to" /></tooltip>
+                                                <tooltip text="{μTP}"><icon icon="exchange" bind:visible="is_u_t_p" /></tooltip>
+                                                <tooltip text="{Encrypted}"><icon icon="lock" bind:visible="is_encrypted" /></tooltip>
+                                            </hc>
+                                        </dtd>
+                                        <dtd>
+                                            <label bind="client_name" />
+                                        </dtd>
+                                        <dtd>
+                                            <label bind="address" /><label text=":" /><label bind="port" />
+                                        </dtd>
+                                        <dtd>
+                                            <lt>
+                                                <ltr>
+                                                    <ltd><icon icon="arrow-down" /><label bind="rate_to_client__size" /></ltd>
+                                                    <ltd><icon icon="arrow-up" /><label bind="rate_to_peer__size" /></ltd>
+                                                </ltr>
+                                            </lt>
+                                        </dtd>
+                                        <dtd>
+                                            <hc>
+                                                <label bind="progress__percent" style="mini" />
+                                                <progressbar bind="progress" width="100" />
+                                            </hc>
+                                        </dtd>
+                                    </dtr>
+                                </bind:template>
+                            </bind:collection>
+                        </tab>
+
+                        <tab title="{Map}">
+                            <contentbox width="100%" height="300" bind="pieces__str" />
+                        </tab>
+                    </tabs>
                 </vc>
             </formgroup>
         </vc>
