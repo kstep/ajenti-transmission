@@ -48,11 +48,11 @@ class TransmissionPlugin (SectionPlugin):
 
 
         def post_file_bind(root, collection, value, ui):
-            ui.find('priority_low').on('click', self.set_file_priority, value, -1)
-            ui.find('priority_normal').on('click', self.set_file_priority, value, 0)
-            ui.find('priority_high').on('click', self.set_file_priority, value, 1)
+            ui.find('priority_low').on('click', self.set_file_priority, value, 'low')
+            ui.find('priority_normal').on('click', self.set_file_priority, value, 'normal')
+            ui.find('priority_high').on('click', self.set_file_priority, value, 'high')
 
-        #self.find('files').post_item_bind = post_file_bind
+        self.find('files').post_item_bind = post_file_bind
 
         self.find('add_dialog').find('target_dir').value = os.path.expanduser('~transmission/Downloads')
 
@@ -70,14 +70,25 @@ class TransmissionPlugin (SectionPlugin):
         priority_low, priority_normal, priority_high = [], [], []
         for file in self.scope.files:
             (files_wanted if file.wanted else files_unwanted).append(file.id)
-            (priority_low if file.priority == -1 else
-             priority_high if file.priority == 1 else
+            (priority_low if file.priority == 'low' else
+             priority_high if file.priority == 'high' else
              priority_normal).append(file.id)
 
         ids = [self.scope.torrent.id]
 
-        self._client.torrent_set(ids=ids, files_wanted=files_wanted, files_unwanted=files_unwanted,
-                priority_low=priority_low, priority_normal=priority_normal, priority_high=priority_high)
+        data = {}
+        if files_wanted:
+            data['files_wanted'] = files_wanted
+        if files_unwanted:
+            data['files_unwanted'] = files_unwanted
+        if priority_low:
+            data['priority_low'] = priority_low
+        if priority_normal:
+            data['priority_normal'] = priority_normal
+        if priority_high:
+            data['priority_high'] = priority_high
+
+        self._client.torrent_set(ids=ids, **data)
 
         self.refresh()
 
