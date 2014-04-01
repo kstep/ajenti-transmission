@@ -128,7 +128,7 @@ class TransmissionPlugin (SectionPlugin):
     def refresh_item(self, item):
         try:
             item.update(self._client.torrent_get(ids=[item.id], fields=['id', 'name', 'sizeWhenDone', 'leftUntilDone',
-                'percentDone', 'bandwidthPriority', 'totalSize', 'eta', 'status', 'error', 'errorString'])[0].__dict__)
+                'percentDone', 'bandwidthPriority', 'totalSize', 'eta', 'status', 'error', 'errorString'])[0])
             if item.error:
                 self.context.notify('error', item.errorString)
             self.binder.populate()
@@ -202,7 +202,7 @@ class TransmissionPlugin (SectionPlugin):
 
     @on('config', 'click')
     def open_config_dialog(self):
-        self.session.update(self._client.session_get().__dict__)
+        self.session.update(self._client.session_get())
         self.session_binder.populate()
         self.find('session_dialog').visible = True
 
