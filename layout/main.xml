@@ -36,19 +36,19 @@
                                     <ltr>
                                         <ltd>
                                             <icon icon="signal" />
-                                            <label style="small" bind="size_now__size" />
+                                            <label style="small" bind="size_now" bindtransform="str_fsize" />
                                             <label style="small" text="/" />
-                                            <label style="small" bind="size_when_done__size" />
+                                            <label style="small" bind="size_when_done" bindtransform="str_fsize" />
                                         </ltd>
 
                                         <ltd>
                                             <icon icon="hdd" />
-                                            <label style="small" bind="total_size__size" />
+                                            <label style="small" bind="total_size" bindtransform="str_fsize" />
                                         </ltd>
 
                                         <ltd>
                                             <icon icon="time" />
-                                            <label style="small" bind="eta__str" />
+                                            <label style="small" bind="eta" bindtransform="str" />
                                         </ltd>
                                     </ltr>
                                 </lt>
@@ -56,7 +56,7 @@
                         </dtd>
                         <dtd>
                             <hc>
-                                <label bind="percent_done__percent" style="mini" />
+                                <label bind="percent_done" bindtransform="lambda x: '%0.2f%%' % (x * 100)"  style="mini" />
                                 <progressbar bind="percent_done" width="100" />
                             </hc>
                         </dtd>
@@ -80,7 +80,7 @@
                 </bind:template>
             </bind:collection>
 
-            <formgroup text="{Torrent info}" bind:visible="torrent__truthy">
+            <formgroup text="{Torrent info}" bind:visible="torrent" bindtransform="bool">
                 <vc>
                     
 
@@ -123,9 +123,9 @@
                                         <dtd>
                                             <lt>
                                                 <ltr>
-                                                    <ltd><icon icon="arrow-down" /><label bind="rate_download__size" /></ltd>
-                                                    <ltd><icon icon="arrow-up" /><label bind="rate_upload__size" /></ltd>
-                                                    <ltd><icon icon="time" /><label bind="eta__str" /></ltd>
+                                                    <ltd><icon icon="arrow-down" /><label bind="rate_download" bindtransform="str_fsize" /></ltd>
+                                                    <ltd><icon icon="arrow-up" /><label bind="rate_upload" bindtransform="str_fsize" /></ltd>
+                                                    <ltd><icon icon="time" /><label bind="eta" bindtransform="str" /></ltd>
                                                 </ltr>
                                             </lt>
                                         </dtd>
@@ -133,8 +133,8 @@
                                         <dtd>
                                             <lt>
                                                 <ltr>
-                                                    <ltd><icon icon="arrow-down" /><label bind="seconds_downloading__str" /></ltd>
-                                                    <ltd><icon icon="arrow-up" /><label bind="seconds_seeding__str" /></ltd>
+                                                    <ltd><icon icon="arrow-down" /><label bind="seconds_downloading" bindtransform="str" /></ltd>
+                                                    <ltd><icon icon="arrow-up" /><label bind="seconds_seeding" bindtransform="str" /></ltd>
                                                 </ltr>
                                             </lt>
                                         </dtd>
@@ -144,17 +144,17 @@
                                         <dtd>
                                             <lt>
                                                 <ltr>
-                                                    <ltd><icon icon="arrow-down" /><label bind="downloaded_ever__size" /></ltd>
-                                                    <ltd><icon icon="arrow-up" /><label bind="uploaded_ever__size" /></ltd>
+                                                    <ltd><icon icon="arrow-down" /><label bind="downloaded_ever" bindtransform="str_fsize" /></ltd>
+                                                    <ltd><icon icon="arrow-up" /><label bind="uploaded_ever" bindtransform="str_fsize" /></ltd>
                                                     <ltd><icon icon="exchange" /><label bind="upload_ratio" /></ltd>
                                                 </ltr>
                                             </lt>
                                         </dtd>
                                         <dth text="{Size}" />
                                         <dtd>
-                                            <label bind="total_size__size" />
+                                            <label bind="total_size" bindtransform="str_fsize" />
                                             <label text=", selected " />
-                                            <label bind="size_when_done__size" />
+                                            <label bind="size_when_done" bindtransform="str_fsize" />
                                         </dtd>
                                     </dtr>
                                     <dtr>
@@ -218,10 +218,10 @@
                                     <dtr>
                                         <dtd><checkbox bind="wanted" /></dtd>
                                         <dtd><label bind="name" /></dtd>
-                                        <dtd><label bind="bytes_completed__size" /><label text=" / " /><label bind="length__size" /></dtd>
+                                        <dtd><label bind="bytes_completed" bindtransform="str_fsize" /><label text=" / " /><label bind="length" bindtransform="str_fsize" /></dtd>
                                         <dtd>
                                             <hc>
-                                                <label bind="percent_done__percent" style="mini" />
+                                                <label bind="percent_done" bindtransform="lambda x: '%0.2f%%' % (x * 100)" style="mini" />
                                                 <progressbar bind="percent_done" width="100" />
                                             </hc>
                                         </dtd>
@@ -271,14 +271,14 @@
                                         <dtd>
                                             <lt>
                                                 <ltr>
-                                                    <ltd><icon icon="arrow-down" /><label bind="rate_to_client__size" /></ltd>
-                                                    <ltd><icon icon="arrow-up" /><label bind="rate_to_peer__size" /></ltd>
+                                                    <ltd><icon icon="arrow-down" /><label bind="rate_to_client" bindtransform="str_fsize" /></ltd>
+                                                    <ltd><icon icon="arrow-up" /><label bind="rate_to_peer" bindtransform="str_fsize" /></ltd>
                                                 </ltr>
                                             </lt>
                                         </dtd>
                                         <dtd>
                                             <hc>
-                                                <label bind="progress__percent" style="mini" />
+                                                <label bind="progress" bindtransform="lambda x: '%0.2f%%' % (x * 100)" style="mini" />
                                                 <progressbar bind="progress" width="100" />
                                             </hc>
                                         </dtd>
@@ -316,7 +316,7 @@
                         </tab>
 
                         <tab title="{Map}">
-                            <contentbox width="100%" height="300" bind="pieces__str" />
+                            <contentbox width="100%" height="300" bind="pieces" bindtransform="str" />
                         </tab>
                     </tabs>
                 </vc>
