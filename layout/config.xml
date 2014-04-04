@@ -1,0 +1,14 @@
+<bind:dict id="bind">
+    <vc>
+        <formline text="{Transmission host and port}">
+            <hc>
+                <textbox bind="host" />
+                <label text=":" />
+                <textbox bind="port" type="number" style="mini" />
+            </hc>
+        </formline>
+        <formline text="{Base RPC URL}">
+            <textbox bind="path" />
+        </formline>
+    </vc>
+</bind:dict>

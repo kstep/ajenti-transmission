@@ -10,14 +10,28 @@ from ajenti.util import str_fsize, str_timedelta
 from ajenti.plugins.transmission.client import Client
 from ajenti.plugins.transmission.models import Torrent, Session
 from ajenti.plugins.models.api import Model
+from ajenti.plugins.configurator.api import ClassConfigEditor
 from datetime import datetime
 import time
 import base64
 import gevent
 import os
 
+
+@plugin
+class TransmissionPluginConfigurator(ClassConfigEditor):
+    title = 'Transmission'
+    icon = 'download-alt'
+
+    def init(self):
+        self.append(self.ui.inflate('transmission:config'))
+
+
 @plugin
 class TransmissionPlugin (SectionPlugin):
+    default_classconfig = {'host': '127.0.0.1', 'port': 9091, 'path': 'transmission/rpc'}
+    classconfig_editor = TransmissionPluginConfigurator
+
     def init(self):
         # meta-data
         self.title = 'Transmission'
@@ -57,7 +71,7 @@ class TransmissionPlugin (SectionPlugin):
         self.find('add_dialog').find('target_dir').value = os.path.expanduser('~transmission/Downloads')
 
     def on_first_page_load(self):
-        self._client = Client()
+        self._client = Client(**self.classconfig)
 
         self.session = self._client.session_get()
         self.session_binder = Binder(self.session, self.find('session_dialog'))
