@@ -44,16 +44,19 @@ upcase_re = re.compile(r'([A-Z])')
 
 
 class bitfield(object):
-    __slots__ = ('value',)
+    __slots__ = ('value', 'bitlen')
 
-    def __init__(self, value, length=None):
+    def __init__(self, value, bitlen=None):
         if type(value) is not bytearray:
             raise TypeError('bytearray expected, got %s' % type(value).__name__)
 
         self.value = value
+        self.bitlen = int(bitlen) if bitlen else len(value) * 8
+
+        assert (len(self.value) - self.bitlen) < 8
 
     def __len__(self):
-        return len(self.value) * 8
+        return self.bitlen
 
     @staticmethod
     def bitcount(byte):
@@ -88,11 +91,14 @@ class bitfield(object):
         return '<bits:[%s]>' % ' '.join(it.imap(lambda n: ('0000000' + bin(n)[2:])[-8:], self.value))
 
     def __iter__(self):
+        length = self.bitlen
+
         for byte in self.value:
             m = 0b10000000
-            while m:
+            while m and length > 0:
                 yield 1 if byte & m else 0
                 m >>= 1
+                length -= 1
 
     def __str__(self):
         return ''.join('■' if b else '□' for b in self)
@@ -292,6 +298,9 @@ class Torrent(TorrentModel):
 
         if 'status' in self:
             self.icon = icon(self.status)
+
+        if 'pieces' in self and 'piece_count' in self:
+            self.pieces.bitlen = self.piece_count
 
 class SessionStat(TorrentModel):
     pass
