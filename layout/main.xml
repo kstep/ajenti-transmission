@@ -21,7 +21,7 @@
                         <dth width="1%" />
                         <dth text="{Name}" />
                         <dth width="150" text="{Progress}" />
-                        <dth width="60" text="{Priority}" />
+                        <dth width="40" text="{Priority}" />
                         <dth width="60" text="{Actions}" />
                     </dtr>
                 </dt>
@@ -30,25 +30,70 @@
                         <dtd><tooltip bind="status"><icon bind="icon" /></tooltip></dtd>
                         <dtd>
                             <collapse>
-                                <label bind="name" style="bold" />
+                                <button id="details" style="link" bind:text="name" />
 
                                 <lt>
-                                    <ltr>
+                                    <ltr bind:visible="status" bindtransform="lambda s: s == 'downloading'">
                                         <ltd>
-                                            <icon icon="signal" />
-                                            <label style="small" bind="size_now" bindtransform="str_fsize" />
+                                            <icon icon="hdd" />
+                                            <label style="small" bind="size_now" bindtransform="lambda s: str_fsize(s or 0)" />
                                             <label style="small" text="/" />
-                                            <label style="small" bind="size_when_done" bindtransform="str_fsize" />
+                                            <label style="small" bind="size_when_done" bindtransform="lambda s: str_fsize(s or 0)" />
                                         </ltd>
 
                                         <ltd>
-                                            <icon icon="hdd" />
-                                            <label style="small" bind="total_size" bindtransform="str_fsize" />
+                                            <icon icon="arrow-down" />
+                                            <label style="small" bind="peers_sending_to_us" />
+                                            <label style="small" text="@" />
+                                            <label style="small" bind="rate_download" bindtransform="lambda s: str_fsize(s or 0)" />
                                         </ltd>
 
                                         <ltd>
                                             <icon icon="time" />
                                             <label style="small" bind="eta" bindtransform="str" />
+                                        </ltd>
+                                    </ltr>
+
+                                    <ltr bind:visible="status" bindtransform="lambda s: s == 'seeding'">
+                                        <ltd>
+                                            <icon icon="hdd" />
+                                            <label style="small" bind="size_now" bindtransform="lambda s: str_fsize(s or 0)" />
+                                        </ltd>
+
+                                        <ltd>
+                                            <icon icon="arrow-up" />
+                                            <label style="small" bind="peers_getting_from_us" />
+                                            <label style="small" text="@" />
+                                            <label style="small" bind="rate_upload" bindtransform="lambda s: str_fsize(s or 0)" />
+                                        </ltd>
+
+                                        <ltd>
+                                            <icon icon="exchange" />
+                                            <label style="small" bind="upload_ratio" />
+                                        </ltd>
+                                    </ltr>
+
+                                    <ltr bind:visible="status" bindtransform="lambda s: s == 'checking'">
+                                        <ltd>
+                                            <icon icon="hdd" />
+                                            <label style="small" bind="size_now" bindtransform="lambda s: str_fsize(s or 0)" />
+                                        </ltd>
+
+                                        <ltd>
+                                            <hc>
+                                                <icon icon="stethoscope" />
+                                                <label bind="recheck_progress" bindtransform="lambda x: '%0.2f%%' % (x * 100)"  style="mini" />
+                                                <progressbar bind="recheck_progress" width="100" />
+                                            </hc>
+                                        </ltd>
+                                    </ltr>
+
+                                    <ltr bind:visible="status" bindtransform="lambda s: s == 'stopped'">
+                                        <ltd>
+                                            <icon icon="hdd" />
+                                            <label style="small" bind="size_now" bindtransform="lambda s: str_fsize(s or 0)" />
+                                            <label style="small" text="/" />
+                                            <label style="small" bind="size_when_done" bindtransform="lambda s: str_fsize(s or 0)" />
                                         </ltd>
                                     </ltr>
                                 </lt>
@@ -61,18 +106,13 @@
                             </hc>
                         </dtd>
                         <dtd>
-                            <hc>
-                                <tooltip text="Low priority"><togglebutton id="priority_low" bind:pressed="is_bandwidth_priority_low" icon="arrow-down" style="mini" /></tooltip>
-                                <tooltip text="Normal priority"><togglebutton id="priority_normal" bind:pressed="is_bandwidth_priority_normal" icon="minus" style="mini" /></tooltip>
-                                <tooltip text="High priority"><togglebutton id="priority_high" bind:pressed="is_bandwidth_priority_high" icon="arrow-up" style="mini" /></tooltip>
-                            </hc>
+                            <tooltip text="{Toggle priority}"><button style="link" bind:text="bandwidth_priority" id="toggle_priority" /></tooltip>
                         </dtd>
                         <dtd>
                             <hc>
-                                <tooltip text="Start"><button id="start" icon="play" style="mini" bind:visible="is_status_stopped" /></tooltip>
-                                <tooltip text="Stop"><button id="stop" icon="pause" style="mini" bind:visible="isnt_status_stopped" /></tooltip>
-                                <tooltip text="Recheck"><button id="recheck" icon="repeat" bind:visible="isnt_status_checking" style="mini" /></tooltip>
-                                <tooltip text="Details"><button id="details" icon="info" style="mini" /></tooltip>
+                                <tooltip text="Start"><button id="start" icon="play" style="mini" bind:visible="status" bindtransform="lambda s: s == 'stopped'" /></tooltip>
+                                <tooltip text="Stop"><button id="stop" icon="pause" style="mini" bind:visible="status" bindtransform="lambda s: s != 'stopped'" /></tooltip>
+                                <tooltip text="Recheck"><button id="recheck" icon="repeat" bind:visible="status" bindtransform="lambda s: s != 'checking'" style="mini" /></tooltip>
                                 <tooltip text="Remove"><button bind="__delete" icon="remove" style="mini" warning="Remove the torrent from list?" /></tooltip>
                             </hc>
                         </dtd>
@@ -123,8 +163,8 @@
                                         <dtd>
                                             <lt>
                                                 <ltr>
-                                                    <ltd><icon icon="arrow-down" /><label bind="rate_download" bindtransform="str_fsize" /></ltd>
-                                                    <ltd><icon icon="arrow-up" /><label bind="rate_upload" bindtransform="str_fsize" /></ltd>
+                                                    <ltd><icon icon="arrow-down" /><label bind="rate_download" bindtransform="lambda s: str_fsize(s or 0)" /></ltd>
+                                                    <ltd><icon icon="arrow-up" /><label bind="rate_upload" bindtransform="lambda s: str_fsize(s or 0)" /></ltd>
                                                     <ltd><icon icon="time" /><label bind="eta" bindtransform="str" /></ltd>
                                                 </ltr>
                                             </lt>
@@ -144,17 +184,17 @@
                                         <dtd>
                                             <lt>
                                                 <ltr>
-                                                    <ltd><icon icon="arrow-down" /><label bind="downloaded_ever" bindtransform="str_fsize" /></ltd>
-                                                    <ltd><icon icon="arrow-up" /><label bind="uploaded_ever" bindtransform="str_fsize" /></ltd>
+                                                    <ltd><icon icon="arrow-down" /><label bind="downloaded_ever" bindtransform="lambda s: str_fsize(s or 0)" /></ltd>
+                                                    <ltd><icon icon="arrow-up" /><label bind="uploaded_ever" bindtransform="lambda s: str_fsize(s or 0)" /></ltd>
                                                     <ltd><icon icon="exchange" /><label bind="upload_ratio" /></ltd>
                                                 </ltr>
                                             </lt>
                                         </dtd>
                                         <dth text="{Size}" />
                                         <dtd>
-                                            <label bind="total_size" bindtransform="str_fsize" />
+                                            <label bind="total_size" bindtransform="lambda s: str_fsize(s or 0)" />
                                             <label text=", selected " />
-                                            <label bind="size_when_done" bindtransform="str_fsize" />
+                                            <label bind="size_when_done" bindtransform="lambda s: str_fsize(s or 0)" />
                                         </dtd>
                                     </dtr>
                                     <dtr>
@@ -162,15 +202,15 @@
                                         <dtd>
                                             <lt>
                                                 <ltr>
-                                                    <ltd><label style="bold" text="{Created }" /><label bind="date_created__datetime" /></ltd>
-                                                    <ltd><label style="bold" text="{Added }" /><label bind="added_date__datetime" /></ltd>
+                                                    <ltd><label style="bold" text="{Created }" /><label bind="date_created" bindtransform="lambda d: d and d.strftime('%b %d %Y, %H:%M')" /></ltd>
+                                                    <ltd><label style="bold" text="{Added }" /><label bind="added_date" bindtransform="lambda d: d and d.strftime('%b %d %Y, %H:%M')" /></ltd>
                                                 </ltr>
                                             </lt>
                                         </dtd>
                                         <dth text="{Run date}" />
                                         <dtd>
                                             <hc>
-                                                <label bind="start_date__datetime" /><label text=" — " /><label bind="done_date__datetime" />
+                                                <label bind="start_date" bindtransform="lambda d: d and d.strftime('%b %d %Y, %H:%M')" /><label text=" — " /><label bind="done_date" bindtransform="lambda d: d and d.strftime('%b %d %Y, %H:%M')" />
                                             </hc>
                                         </dtd>
                                     </dtr>
@@ -181,16 +221,22 @@
                         <tab title="{Limits}">
                             <bind:dict bind="torrent">
                                 <formline text="{Download limits}">
-                                    <textbox bind="download_limit" type="number" />
-                                    <checkbox bind="download_limited" text="{Active}" />
+                                    <hc>
+                                        <textbox bind="download_limit" type="number" />
+                                        <checkbox bind="download_limited" text="{Use}" />
+                                    </hc>
                                 </formline>
                                 <formline text="{Upload limits}">
-                                    <textbox bind="upload_limit" type="number" />
-                                    <checkbox bind="upload_limited" text="{Active}" />
+                                    <hc>
+                                        <textbox bind="upload_limit" type="number" />
+                                        <checkbox bind="upload_limited" text="{Use}" />
+                                    </hc>
                                 </formline>
                                 <formline text="{Ratio limits}">
-                                    <textbox bind="seed_ratio_limit" type="number" />
-                                    <dropdown values="['global', 'single', 'limited']" labels="['Global', 'Single', 'Limited']" bind="seed_ratio_mode" />
+                                    <hc>
+                                        <textbox bind="seed_ratio_limit" type="number" />
+                                        <dropdown values="['global', 'single', 'limited']" labels="['Global', 'Single', 'Limited']" bind="seed_ratio_mode" />
+                                    </hc>
                                 </formline>
                                 <formline text="{Global limits}">
                                     <checkbox bind="honors_session_limits" text="{Honor session limits}" />
@@ -211,14 +257,14 @@
                                         <dth text="{Name}" />
                                         <dth text="{Size}" />
                                         <dth text="{Progress}" />
-                                        <dth width="60" text="{Priority}" />
+                                        <dth width="40" text="{Priority}" />
                                     </dtr>
                                 </dt>
                                 <bind:template>
                                     <dtr>
                                         <dtd><checkbox bind="wanted" /></dtd>
                                         <dtd><label bind="name" /></dtd>
-                                        <dtd><label bind="bytes_completed" bindtransform="str_fsize" /><label text=" / " /><label bind="length" bindtransform="str_fsize" /></dtd>
+                                        <dtd><label bind="bytes_completed" bindtransform="lambda s: str_fsize(s or 0)" /><label text=" / " /><label bind="length" bindtransform="lambda s: str_fsize(s or 0)" /></dtd>
                                         <dtd>
                                             <hc>
                                                 <label bind="percent_done" bindtransform="lambda x: '%0.2f%%' % (x * 100)" style="mini" />
@@ -227,9 +273,9 @@
                                         </dtd>
                                         <dtd>
                                             <hc>
-                                                <tooltip text="Low priority"><togglebutton id="priority_low" bind:pressed="is_priority_low" icon="arrow-down" style="mini" /></tooltip>
-                                                <tooltip text="Normal priority"><togglebutton id="priority_normal" bind:pressed="is_priority_normal" icon="minus" style="mini" /></tooltip>
-                                                <tooltip text="High priority"><togglebutton id="priority_high" bind:pressed="is_priority_high" icon="arrow-up" style="mini" /></tooltip>
+                                                <tooltip text="Low priority"><togglebutton id="priority_low" bind:pressed="priority" bindtransform="lambda p: p == 'low'" icon="arrow-down" style="mini" /></tooltip>
+                                                <tooltip text="Normal priority"><togglebutton id="priority_normal" bind:pressed="priority" bindtransform="lambda p: p == 'normal'" icon="minus" style="mini" /></tooltip>
+                                                <tooltip text="High priority"><togglebutton id="priority_high" bind:pressed="priority" bindtransform="lambda p: p == 'high'" icon="arrow-up" style="mini" /></tooltip>
                                             </hc>
                                         </dtd>
                                     </dtr>
@@ -271,8 +317,8 @@
                                         <dtd>
                                             <lt>
                                                 <ltr>
-                                                    <ltd><icon icon="arrow-down" /><label bind="rate_to_client" bindtransform="str_fsize" /></ltd>
-                                                    <ltd><icon icon="arrow-up" /><label bind="rate_to_peer" bindtransform="str_fsize" /></ltd>
+                                                    <ltd><icon icon="arrow-down" /><label bind="rate_to_client" bindtransform="lambda s: str_fsize(s or 0)" /></ltd>
+                                                    <ltd><icon icon="arrow-up" /><label bind="rate_to_peer" bindtransform="lambda s: str_fsize(s or 0)" /></ltd>
                                                 </ltr>
                                             </lt>
                                         </dtd>
@@ -372,16 +418,22 @@
             <formgroup text="{Global limits}">
                 <vc>
                     <formline text="{Download speed}">
-                        <textbox type="number" bind="speed_limit_down" />
-                        <checkbox text="{Active}" bind="speed_limit_down_enabled" />
+                        <hc>
+                            <textbox type="number" bind="speed_limit_down" />
+                            <checkbox text="{Use}" bind="speed_limit_down_enabled" />
+                        </hc>
                     </formline>
                     <formline text="{Upload speed}">
-                        <textbox type="number" bind="speed_limit_up" />
-                        <checkbox text="{Active}" bind="speed_limit_up_enabled" />
+                        <hc>
+                            <textbox type="number" bind="speed_limit_up" />
+                            <checkbox text="{Use}" bind="speed_limit_up_enabled" />
+                        </hc>
                     </formline>
                     <formline text="{Ratio}">
-                        <textbox type="number" bind="seed_ratio_limit" />
-                        <checkbox text="{Active}" bind="seed_ratio_limited" />
+                        <hc>
+                            <textbox type="number" bind="seed_ratio_limit" />
+                            <checkbox text="{Use}" bind="seed_ratio_limited" />
+                        </hc>
                     </formline>
                 </vc>
             </formgroup>

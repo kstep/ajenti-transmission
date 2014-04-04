@@ -50,9 +50,7 @@ class TransmissionPlugin (SectionPlugin):
                 files=[])
 
         def post_item_bind(root, collection, value, ui):
-            ui.find('priority_low').on('click', self.set_priority, value, -1)
-            ui.find('priority_normal').on('click', self.set_priority, value, 0)
-            ui.find('priority_high').on('click', self.set_priority, value, 1)
+            ui.find('toggle_priority').on('click', self.toggle_priority, value)
             ui.find('start').on('click', self.start, value)
             ui.find('stop').on('click', self.stop, value)
             ui.find('details').on('click', self.details, value)
@@ -133,11 +131,12 @@ class TransmissionPlugin (SectionPlugin):
     @on('refresh', 'click')
     def refresh(self):
         self.scope.torrents = self._client.torrent_get(fields=['id', 'name', 'sizeWhenDone', 'leftUntilDone',
-            'percentDone', 'bandwidthPriority', 'totalSize', 'eta', 'status', 'error', 'errorString'])
+            'percentDone', 'bandwidthPriority', 'totalSize', 'eta', 'status', 'error', 'errorString',
+            'peersSendingToUs', 'peersGettingFromUs', 'uploadRatio', 'rateDownload', 'rateUpload', 'recheckProgress'])
 
         for t in self.scope.torrents:
             if t.error:
-                self.context.notify('error', t.errorString)
+                self.context.notify('error', 'Torrent #%s (%s): %s' % (t.id, t.name, t.error_string))
 
         if self.scope.torrent:
             self.refresh_item(self.scope.torrent)
@@ -147,9 +146,10 @@ class TransmissionPlugin (SectionPlugin):
     def refresh_item(self, item):
         try:
             item.update(self._client.torrent_get(ids=[item.id], fields=['id', 'name', 'sizeWhenDone', 'leftUntilDone',
-                'percentDone', 'bandwidthPriority', 'totalSize', 'eta', 'status', 'error', 'errorString'])[0])
+                    'percentDone', 'bandwidthPriority', 'totalSize', 'eta', 'status', 'error', 'errorString',
+                    'peersSendingToUs', 'peersGettingFromUs', 'uploadRatio', 'rateDownload', 'rateUpload', 'recheckProgress'])[0])
             if item.error:
-                self.context.notify('error', item.errorString)
+                self.context.notify('error', 'Torrent #%s (%s): %s' % (item.id, item.name, item.error_string))
             self.binder.populate()
 
         except IndexError:
@@ -157,6 +157,12 @@ class TransmissionPlugin (SectionPlugin):
 
     def set_priority(self, item, value):
         self._client.torrent_set(ids=[item.id], bandwidthPriority=value)
+        self.refresh_item(item)
+
+    def toggle_priority(self, item):
+        self._client.torrent_set(ids=[item.id], bandwidthPriority=(
+                    {'low': -1, 'normal': 0, 'high': 1}[item.bandwidth_priority] + 2
+                    ) % 3 - 1)
         self.refresh_item(item)
 
     def set_file_priority(self, item, value):
