@@ -1,6 +1,6 @@
 # -*- encoding: utf-8 -*-
 from __future__ import division
-from ajenti.plugins.models.api import Model, unixtime, listof, sort, timedelta
+from ajenti.plugins.models.api import Model, unixtime, listof, timedelta
 import operator as op
 import itertools as it
 import base64
