@@ -1,6 +1,6 @@
 <bind:dict id="bind">
     <vc>
-        <formline text="{Transmission host and port}">
+        <formline text="{Transmission host}">
             <hc>
                 <textbox bind="host" />
                 <label text=":" />

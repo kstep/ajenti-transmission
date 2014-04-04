@@ -12,6 +12,7 @@ from ajenti.plugins.transmission.models import Torrent, Session
 from ajenti.plugins.models.api import Model
 from ajenti.plugins.configurator.api import ClassConfigEditor
 from datetime import datetime
+from requests import ConnectionError
 import time
 import base64
 import gevent
@@ -73,12 +74,16 @@ class TransmissionPlugin (SectionPlugin):
     def on_first_page_load(self):
         self._client = Client(**self.classconfig)
 
-        self.session = self._client.session_get()
-        self.session_binder = Binder(self.session, self.find('session_dialog'))
+        try:
+            self.session = self._client.session_get()
+            self.session_binder = Binder(self.session, self.find('session_dialog'))
+            self.binder = Binder(self.scope, self.find('main'))
+            self.refresh()
 
-        self.binder = Binder(self.scope, self.find('main'))
+        except ConnectionError, e:
+            self.context.notify('error', str(e))
+            self.context.launch('configure-plugin', plugin=self)
 
-        self.refresh()
 
     @on('apply_limits', 'click')
     def apply_limits(self):
