@@ -82,6 +82,12 @@ class TransmissionPlugin (SectionPlugin):
             self.context.notify('error', str(e))
             self.context.launch('configure-plugin', plugin=self)
 
+    @on('status_filter', 'switch')
+    def set_filter(self):
+        tab = self.find('status_filter').active
+        status = ['all', 'downloading', 'seeding', 'stopped'][tab]
+        self.find('torrents').filter = (lambda t: t.status == status) if tab else (lambda t: True)
+        self.binder.populate()
 
     @on('apply_limits', 'click')
     def apply_limits(self):

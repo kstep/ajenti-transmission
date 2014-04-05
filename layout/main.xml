@@ -15,6 +15,13 @@
         </hc>
 
         <vc>
+            <tabs id="status_filter">
+                <tab title="{All}" />
+                <tab title="{Downloading}" />
+                <tab title="{Seeding}" />
+                <tab title="{Stopped}" />
+            </tabs>
+
             <bind:collection bind="torrents" id="torrents">
                 <dt bind="__items">
                     <dtr>
