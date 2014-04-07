@@ -8,17 +8,17 @@
             </hc>
         </right>
 
-        <hc>
-            <button id="refresh" icon="refresh" text="{Refresh}" style="mini" />
-            <button id="add" text="{Add torrent}" icon="download-alt" style="mini" />
-            <button id="config" text="{Session config}" icon="cogs" style="mini" />
+        <bind:dict bind="session">
+            <hc>
+                <button id="refresh" icon="refresh" text="{Refresh}" style="mini" />
+                <button id="add" text="{Add torrent}" icon="download-alt" style="mini" />
+                <button id="config" text="{Session config}" icon="cogs" style="mini" />
 
-            <bind:dict bind="session">
-            <indent>
-                <togglebutton id="alt_speed" icon="pushpin" bind:pressed="alt_speed_enabled" style="mini" text="{Alt speed}" />
-            </indent>
-            </bind:dict>
-        </hc>
+                <indent>
+                    <togglebutton id="alt_speed" icon="pushpin" bind:pressed="alt_speed_enabled" style="mini" text="{Alt speed}" />
+                </indent>
+            </hc>
+        </bind:dict>
 
         <vc>
             <tabs id="status_filter">
@@ -409,6 +409,16 @@
                 </vc>
             </formgroup>
         </vc>
+
+        <bind:dict bind="session">
+            <right>
+                <pad>
+                    <label text="Version " /><label bind="version" />
+                    <label text=", API v" /><label bind="rpc_version" />
+                    <label text=", min " /><label bind="rpc_version_minimum" />
+                </pad>
+            </right>
+        </bind:dict>
     </pad>
 
     <dialog visible="False" id="add_dialog" buttons="[
