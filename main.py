@@ -69,6 +69,7 @@ class TransmissionPlugin (SectionPlugin):
         self.find('files').post_item_bind = post_file_bind
 
         self.find('add_dialog').find('target_dir').value = os.path.expanduser('~transmission/Downloads')
+        self.find('add_dialog').find('priority').value = 0
 
     def on_first_page_load(self):
         self._client = Client(**self.classconfig)
@@ -289,12 +290,9 @@ class TransmissionPlugin (SectionPlugin):
 
     @on('add', 'click')
     def open_add_dialog(self):
-        self.find('add_dialog').visible = True
-
-    @on('move', 'click')
-    def open_move_dialog(self):
-        dialog = self.find('move_dialog')
-        dialog.find('target_dir').value = self.scope.torrent.download_dir
+        dialog = self.find('add_dialog')
+        dialog.find('url').value = ''
+        dialog.find('local_file').value = ''
         dialog.visible = True
 
     _torrent_data = None
@@ -307,6 +305,7 @@ class TransmissionPlugin (SectionPlugin):
             options = {
                     'paused': dialog.find('add_paused').value,
                     'download_dir': dialog.find('target_dir').value,
+                    'bandwidthPriority': dialog.find('priority').value,
                     }
 
             url = dialog.find('url').value.strip()

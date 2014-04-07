@@ -417,23 +417,32 @@
         ]">
         <pad>
             <formgroup text="{Add new torrent}">
-                <vc>
-                    <formline text="{URL}">
-                        <textbox id="url" />
-                    </formline>
-                    <formline text="{Local file}">
-                        <pathbox id="local_file" />
-                    </formline>
-                    <formline text="{Upload file}">
-                        <fileupload id="upload_file" target="ajenti:transmission-upload" />
-                    </formline>
-                </vc>
+                <tabs>
+                    <tab title="{by URL}">
+                        <formline text="{URL}">
+                            <textbox id="url" />
+                        </formline>
+                    </tab>
+                    <tab title="{from local file}">
+                        <formline text="{Local file}">
+                            <pathbox id="local_file" />
+                        </formline>
+                    </tab>
+                    <tab title="{from uploaded file}">
+                        <formline text="{Upload file}">
+                            <fileupload id="upload_file" target="ajenti:transmission-upload" />
+                        </formline>
+                    </tab>
+                </tabs>
             </formgroup>
 
             <formgroup text="{Download options}">
                 <vc>
                     <formline text="{Download to}">
                         <pathbox id="target_dir" directory="True" />
+                    </formline>
+                    <formline text="{Priority}">
+                        <dropdown labels="['Low', 'Normal', 'High']" values="[-1, 0, 1]" id="priority" />
                     </formline>
                     <formline>
                         <checkbox text="{Pause on add}" id="add_paused" value="True" />
