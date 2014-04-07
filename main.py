@@ -8,7 +8,7 @@ from ajenti.ui.binder import Binder
 from ajenti.ui import on
 from ajenti.util import str_fsize, str_timedelta
 from ajenti.plugins.transmission.client import Client
-from ajenti.plugins.transmission.models import Torrent, Session
+from ajenti.plugins.transmission.models import Torrent, Session, SessionStat
 from ajenti.plugins.models.api import Model
 from ajenti.plugins.configurator.api import ClassConfigEditor
 from datetime import datetime
@@ -32,6 +32,7 @@ class Scope(Model):
         'torrents': [],
         'session': Session.EMPTY,
         'torrent': Torrent.EMPTY,
+        'session_stats': SessionStat.EMPTY,
         }
 
 @plugin
@@ -89,6 +90,7 @@ class TransmissionPlugin (SectionPlugin):
 
         try:
             self.scope.session = self._client.session_get()
+            self.scope.session_stats = self._client.session_stats()
             self.scope.torrents = self._client.torrent_get(fields=self.TORRENT_FIELDS)
             self.scope.torrent = self._client.torrent_get(fields=self.TORRENT_FIELDS_DETAILED)[0]
             self.binder = Binder(self.scope, self.find('main'))
@@ -237,9 +239,18 @@ class TransmissionPlugin (SectionPlugin):
     def reannounce(self):
         self._client.torrent_reannounce(ids=[self.scope.torrent.id])
 
+    @on('stats', 'click')
+    def open_stats_dialog(self):
+        self.scope.session_stats.update(self._client.session_stats())
+        self.find('stats_dialog').visible = True
+
+    @on('stats_dialog', 'button')
+    def submit_stats_dialog(self, button):
+        self.find('stats_dialog').visible = False
+
     @on('config', 'click')
     def open_config_dialog(self):
-        self.find('session_dialog').visible = True
+        self.find('config_dialog').visible = True
 
     @on('alt_speed', 'click')
     def toggle_alt_speed(self):
@@ -247,9 +258,9 @@ class TransmissionPlugin (SectionPlugin):
         self._client.session_set(alt_speed_enabled=alt_speed)
         self.binder.populate()
 
-    @on('session_dialog', 'button')
+    @on('config_dialog', 'button')
     def submit_config_dialog(self, button):
-        dialog = self.find('session_dialog')
+        dialog = self.find('config_dialog')
         dialog.visible = False
 
         if button == 'apply':

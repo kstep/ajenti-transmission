@@ -3,22 +3,20 @@
 
         <right>
             <hc>
+                <bind:dict bind="session"><togglebutton id="alt_speed" icon="pushpin" bind:pressed="alt_speed_enabled" style="mini" text="{Alt speed}" /></bind:dict>
                 <button id="start_all" text="{Start all}" icon="play" style="mini" />
                 <button id="stop_all" text="{Stop all}" icon="stop" style="mini" />
             </hc>
         </right>
 
-        <bind:dict bind="session">
-            <hc>
-                <button id="refresh" icon="refresh" text="{Refresh}" style="mini" />
-                <button id="add" text="{Add torrent}" icon="download-alt" style="mini" />
-                <button id="config" text="{Session config}" icon="cogs" style="mini" />
-
-                <indent>
-                    <togglebutton id="alt_speed" icon="pushpin" bind:pressed="alt_speed_enabled" style="mini" text="{Alt speed}" />
-                </indent>
-            </hc>
-        </bind:dict>
+        <hc>
+            <button id="refresh" icon="refresh" text="{Refresh}" style="mini" />
+            <button id="add" text="{Add torrent}" icon="download-alt" style="mini" />
+            <indent>
+                <button id="config" text="{Config}" icon="cogs" style="mini" />
+                <button id="stats" text="{Stats}" icon="signal" style="mini" />
+            </indent>
+        </hc>
 
         <vc>
             <tabs id="status_filter">
@@ -459,7 +457,7 @@
         </pad>
     </dialog>
 
-    <dialog visible="False" binder:context="session" id="session_dialog" buttons="[
+    <dialog visible="False" binder:context="session" id="config_dialog" buttons="[
         {'id': 'apply', 'text': _('Apply')},
         {'id': 'cancel', 'text': _('Cancel')}
         ]">
@@ -568,6 +566,107 @@
                     </formline>
                 </vc>
             </formgroup>
+        </pad>
+    </dialog>
+
+    <dialog visible="False" binder:context="session_stats" id="stats_dialog" buttons="[
+        {'id': 'ok', 'text': _('OK')},
+        ]">
+        <pad>
+            <tabs>
+                <tab title="{General stats}">
+                    <dt>
+                        <dtr>
+                            <dth text="{Torrents count}" />
+                            <dtd>
+                                <lt>
+                                    <ltr>
+                                        <ltd><icon icon="play" /><label bind="active_torrent_count" /></ltd>
+                                        <ltd><icon icon="pause" /><label bind="paused_torrent_count" /></ltd>
+                                        <ltd><icon icon="exchange" /><label bind="torrent_count" /></ltd>
+                                    </ltr>
+                                </lt>
+                            </dtd>
+                        </dtr>
+
+                        <dtr>
+                            <dth text="{Speed}" />
+                            <dtd>
+                                <lt>
+                                    <ltr>
+                                        <ltd><icon icon="arrow-down" /><label bind="download_speed" bindtransform="str_fsize" /></ltd>
+                                        <ltd><icon icon="arrow-up" /><label bind="upload_speed" bindtransform="str_fsize" /></ltd>
+                                    </ltr>
+                                </lt>
+                            </dtd>
+                        </dtr>
+                    </dt>
+                </tab>
+                <tab title="{Current stats}">
+                    <bind:dict bind="current_stats">
+                        <dt>
+                            <dtr>
+                                <dth text="{Volume}" />
+                                <dtd>
+                                    <lt>
+                                        <ltr>
+                                            <ltd><icon icon="arrow-down" /><label bind="downloaded_bytes" bindtransform="str_fsize" /></ltd>
+                                            <ltd><icon icon="arrow-up" /><label bind="uploaded_bytes" bindtransform="str_fsize" /></ltd>
+                                        </ltr>
+                                    </lt>
+                                </dtd>
+                            </dtr>
+
+                            <dtr>
+                                <dth text="{Files added}" />
+                                <dtd><icon icon="copy" /><label bind="files_added" /></dtd>
+                            </dtr>
+
+                            <dtr>
+                                <dth text="{Session count}" />
+                                <dtd><icon icon="cog" /><label bind="session_count" /></dtd>
+                            </dtr>
+
+                            <dtr>
+                                <dth text="{Active time}" />
+                                <dtd><icon icon="time" /><label bind="seconds_active" bindtransform="str" /></dtd>
+                            </dtr>
+                        </dt>
+                    </bind:dict>
+                </tab>
+                <tab title="{Cumulative stats}">
+                    <bind:dict bind="cumulative_stats">
+                        <dt>
+                            <dtr>
+                                <dth text="{Volume}" />
+                                <dtd>
+                                    <lt>
+                                        <ltr>
+                                            <ltd><icon icon="arrow-down" /><label bind="downloaded_bytes" bindtransform="str_fsize" /></ltd>
+                                            <ltd><icon icon="arrow-up" /><label bind="uploaded_bytes" bindtransform="str_fsize" /></ltd>
+                                        </ltr>
+                                    </lt>
+                                </dtd>
+                            </dtr>
+
+                            <dtr>
+                                <dth text="{Files added}" />
+                                <dtd><icon icon="copy" /><label bind="files_added" /></dtd>
+                            </dtr>
+
+                            <dtr>
+                                <dth text="{Session count}" />
+                                <dtd><icon icon="cog" /><label bind="session_count" /></dtd>
+                            </dtr>
+
+                            <dtr>
+                                <dth text="{Active time}" />
+                                <dtd><icon icon="time" /><label bind="seconds_active" bindtransform="str" /></dtd>
+                            </dtr>
+                        </dt>
+                    </bind:dict>
+                </tab>
+            </tabs>
         </pad>
     </dialog>
 
