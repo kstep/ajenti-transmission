@@ -213,7 +213,6 @@
                                                 <ltr>
                                                     <ltd><icon icon="arrow-down" /><label bind="downloaded_ever" bindtransform="str_fsize" /></ltd>
                                                     <ltd><icon icon="arrow-up" /><label bind="uploaded_ever" bindtransform="str_fsize" /></ltd>
-                                                    <ltd><icon icon="download" /><label bind="size_now" bindtransform="str_fsize" /></ltd>
                                                     <ltd><icon icon="exchange" /><label bind="upload_ratio" /></ltd>
                                                 </ltr>
                                             </lt>
@@ -228,6 +227,10 @@
                                         <dtd>
                                             <lt>
                                                 <ltr>
+                                                    <ltd>
+                                                        <icon icon="download" /><label bind="size_now" bindtransform="str_fsize" />
+                                                    </ltd>
+
                                                     <ltd>
                                                         <icon icon="hdd" />
                                                         <label bind="size_when_done" bindtransform="str_fsize" />
