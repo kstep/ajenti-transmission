@@ -27,11 +27,32 @@ class TransmissionPluginConfigurator(ClassConfigEditor):
     def init(self):
         self.append(self.ui.inflate('transmission:config'))
 
+class Scope(Model):
+    _defaults = {
+        'torrents': [],
+        'session': Session.EMPTY,
+        'torrent': Torrent.EMPTY,
+        }
 
 @plugin
 class TransmissionPlugin (SectionPlugin):
     default_classconfig = {'host': '127.0.0.1', 'port': 9091, 'path': 'transmission/rpc'}
     classconfig_editor = TransmissionPluginConfigurator
+
+    TORRENT_FIELDS = ['id', 'name', 'sizeWhenDone', 'leftUntilDone',
+            'percentDone', 'bandwidthPriority', 'totalSize', 'eta', 'status', 'error', 'errorString',
+            'peersSendingToUs', 'peersGettingFromUs', 'uploadRatio', 'rateDownload', 'rateUpload', 'recheckProgress']
+    TORRENT_FIELDS_DETAILED = ['id', 'files', 'fileStats', 'name', 'torrentFile', 'downloadDir',
+            'peersSendingToUs', 'peersGettingFromUs', 'peersConnected',
+            'bandwidthPriority', 'secondsDownloading', 'secondsSeeding',
+            'downloadedEver', 'uploadedEver', 'uploadRatio', 'peers', 'pieces', 'pieceCount',
+            'pieceSize', 'sizeWhenDone', 'leftUntilDone', 'totalSize', 'eta', 'rateUpload', 'rateDownload',
+            'addedDate', 'dateCreated', 'startDate', 'doneDate',
+            'trackers',  # 'trackerStats',
+            #'lastAnnounceTime', 'lastScrapeTime', 'announceURL', 'scrapeURL',
+            #'announceResponse', 'scrapeResponse'
+            'honorsSessionLimits', 'peer-limit', 'downloadLimit', 'downloadLimited',
+            'seedRatioLimit', 'seedRationMode', 'uploadLimit', 'uploadLimited']
 
     def init(self):
         # meta-data
@@ -40,15 +61,7 @@ class TransmissionPlugin (SectionPlugin):
         self.category = _("Software")
 
         self.append(self.ui.inflate('transmission:main'))
-
-        self.scope = Model(
-                torrents=[],
-                torrent=Torrent.EMPTY,
-                peers=[],
-                pieces=[],
-                trackers=[],
-                session=Session.EMPTY,
-                files=[])
+        self.scope = Scope()
 
         def post_item_bind(root, collection, value, ui):
             ui.find('toggle_priority').on('click', self.toggle_priority, value)
@@ -76,8 +89,10 @@ class TransmissionPlugin (SectionPlugin):
 
         try:
             self.scope.session = self._client.session_get()
+            self.scope.torrents = self._client.torrent_get(fields=self.TORRENT_FIELDS)
+            self.scope.torrent = self._client.torrent_get(fields=self.TORRENT_FIELDS_DETAILED)[0]
             self.binder = Binder(self.scope, self.find('main'))
-            self.refresh()
+            self.binder.populate()
 
         except ConnectionError, e:
             self.context.notify('error', str(e))
@@ -137,10 +152,8 @@ class TransmissionPlugin (SectionPlugin):
 
     @on('refresh', 'click')
     def refresh(self):
-        self.scope.torrents = self._client.torrent_get(fields=['id', 'name', 'sizeWhenDone', 'leftUntilDone',
-            'percentDone', 'bandwidthPriority', 'totalSize', 'eta', 'status', 'error', 'errorString',
-            'peersSendingToUs', 'peersGettingFromUs', 'uploadRatio', 'rateDownload', 'rateUpload', 'recheckProgress'])
-        self.scope.session = self._client.session_get()
+        self.scope.torrents[:] = self._client.torrent_get(fields=self.TORRENT_FIELDS)
+        self.scope.session.update(self._client.session_get())
 
         for t in self.scope.torrents:
             if t.error:
@@ -153,9 +166,7 @@ class TransmissionPlugin (SectionPlugin):
 
     def refresh_item(self, item):
         try:
-            item.update(self._client.torrent_get(ids=[item.id], fields=['id', 'name', 'sizeWhenDone', 'leftUntilDone',
-                    'percentDone', 'bandwidthPriority', 'totalSize', 'eta', 'status', 'error', 'errorString',
-                    'peersSendingToUs', 'peersGettingFromUs', 'uploadRatio', 'rateDownload', 'rateUpload', 'recheckProgress'])[0])
+            item.update(self._client.torrent_get(ids=[item.id], fields=self.TORRENT_FIELDS)[0])
             if item.error:
                 self.context.notify('error', 'Torrent #%s (%s): %s' % (item.id, item.name, item.error_string))
             self.binder.populate()
@@ -213,26 +224,7 @@ class TransmissionPlugin (SectionPlugin):
         self.refresh_item(item)
 
     def details(self, item):
-        self.scope.torrent = self._client.torrent_get(ids=[item.id], fields=[
-            'id', 'files', 'fileStats', 'name', 'torrentFile', 'downloadDir',
-            'peersSendingToUs', 'peersGettingFromUs', 'peersConnected',
-            'bandwidthPriority', 'secondsDownloading', 'secondsSeeding',
-            'downloadedEver', 'uploadedEver', 'uploadRatio', 'peers', 'pieces', 'pieceCount',
-            'pieceSize', 'sizeWhenDone', 'leftUntilDone', 'totalSize', 'eta', 'rateUpload', 'rateDownload',
-            'addedDate', 'dateCreated', 'startDate', 'doneDate',
-            'trackers',  # 'trackerStats',
-            #'lastAnnounceTime', 'lastScrapeTime', 'announceURL', 'scrapeURL',
-            #'announceResponse', 'scrapeResponse'
-            'honorsSessionLimits', 'peer-limit', 'downloadLimit', 'downloadLimited',
-            'seedRatioLimit', 'seedRationMode', 'uploadLimit', 'uploadLimited',
-            ])[0]
-
-        self.scope.trackers, self.scope.files, self.scope.peers, self.scope.pieces = (
-                self.scope.torrent.trackers,
-                self.scope.torrent.files,
-                self.scope.torrent.peers,
-                self.scope.torrent.pieces)
-
+        self.scope.torrent.update(self._client.torrent_get(ids=[item.id], fields=self.TORRENT_FIELDS_DETAILED)[0])
         self.binder.populate()
 
     def remove(self, item, collection):
@@ -266,9 +258,9 @@ class TransmissionPlugin (SectionPlugin):
                     alt_speed_down=self.scope.session.alt_speed_down,
                     alt_speed_up=self.scope.session.alt_speed_up,
                     alt_speed_enabled=self.scope.session.alt_speed_enabled,
-                    alt_speed_time_begin=self.scope.session.alt_speed_time_begin,
-                    alt_speed_time_end=self.scope.session.alt_speed_time_end,
-                    alt_speed_time_day=self.scope.session.alt_speed_time_day,
+                    alt_speed_time_begin=reduce(lambda a, t: a * 60 + int(t), self.scope.session.alt_speed_time_begin.split(':', 1), 0),
+                    alt_speed_time_end=reduce(lambda a, t: a * 60 + int(t), self.scope.session.alt_speed_time_end.split(':', 1), 0),
+                    alt_speed_time_day=int(self.scope.session.alt_speed_time_day),
                     dht_enabled=self.scope.session.dht_enabled,
                     pex_enabled=self.scope.session.pex_enabled,
                     encryption=self.scope.session.encryption,

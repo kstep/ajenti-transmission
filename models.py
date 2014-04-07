@@ -341,20 +341,29 @@ class WeekDays(object):
 
         self.value = (self.value & ~mask) | (mask & value)
 
+    def get(self, name, default=None):
+        try:
+            return self[name]
+        except KeyError:
+            return default
+
     def __int__(self):
         return self.value
 
     def __str__(self):
         return ', '.join(dow for dow, mask in self.MASKS.iteritems() if self.value & mask != 0)
 
+    def __repr__(self):
+        return '<WeekDays: [%s]>' % str(self)
+
 class Session(TorrentModel):
     _casts = {
             #'alt-speed-down': int,
             #'alt-speed-enabled': bool,
-            #'alt-speed-time-begin': unixtime,
+            'alt-speed-time-begin': lambda t: '%02d:%02d' % divmod(t, 60),
             #'alt-speed-time-enabled': bool,
-            #'alt-speed-time-end': unixtime,
-            #'alt-speed-time-day': WeekDays,
+            'alt-speed-time-end': lambda t: '%02d:%02d' % divmod(t, 60),
+            'alt-speed-time-day': WeekDays,
             #'alt-speed-up': int,
             #'blocklist-enabled': bool,
             #'blocklist-size': int,

@@ -133,162 +133,158 @@
                 </bind:template>
             </bind:collection>
 
-            <formgroup text="{Torrent info}" bind:visible="torrent" bindtransform="bool">
+            <formgroup text="{Torrent info}" bind:visible="torrent" bindtransform="bool" binder:context="torrent">
                 <vc>
                     
 
                     <tabs>
                         <tab title="{Info}">
-                            <bind:dict bind="torrent" id="torrent">
-                                <dt>
-                                    <dtr>
-                                        <dth text="{Name}" width="90" />
-                                        <dtd>
-                                            <collapse>
-                                                <label bind="name" />
-                                                <textbox bind="torrent_file" readonly="True" style="big" />
-                                            </collapse>
-                                        </dtd>
-                                        <dth text="{Priority}" />
-                                        <dtd>
-                                            <lt>
-                                                <ltr>
-                                                    <ltd>
-                                                        <label bind="bandwidth_priority" />
-                                                    </ltd>
+                            <dt>
+                                <dtr>
+                                    <dth text="{Name}" width="90" />
+                                    <dtd>
+                                        <collapse>
+                                            <label bind="name" />
+                                            <textbox bind="torrent_file" readonly="True" style="big" />
+                                        </collapse>
+                                    </dtd>
+                                    <dth text="{Priority}" />
+                                    <dtd>
+                                        <lt>
+                                            <ltr>
+                                                <ltd>
+                                                    <label bind="bandwidth_priority" />
+                                                </ltd>
 
-                                                    <ltd>
-                                                        <togglebutton bind:pressed="bandwidth_priority" bindtransform="lambda s: s == 'low'" style="mini" icon="arrow-down" id="priority_low" />
-                                                        <togglebutton bind:pressed="bandwidth_priority" bindtransform="lambda s: s == 'normal'" style="mini" icon="minus" id="priority_normal" />
-                                                        <togglebutton bind:pressed="bandwidth_priority" bindtransform="lambda s: s == 'high'" style="mini" icon="arrow-up" id="priority_high" />
-                                                    </ltd>
-                                                </ltr>
-                                            </lt>
-                                        </dtd>
-                                    </dtr>
-                                    <dtr>
-                                        <dth text="{Destionation}" />
-                                        <dtd>
-                                            <hc>
-                                                <pathbox directory="True" style="big" bind="download_dir" id="download_dir" />
-                                                <tooltip text="{Move files}"><button style="mini" id="move" icon="ok" /></tooltip>
-                                            </hc>
-                                        </dtd>
-                                        <dth text="{Peers}" />
-                                        <dtd>
-                                            <lt>
-                                                <ltr>
-                                                    <ltd><icon icon="arrow-down" /><label bind="peers_sending_to_us" /></ltd>
-                                                    <ltd><icon icon="arrow-up" /><label bind="peers_getting_from_us" /></ltd>
-                                                    <ltd><icon icon="exchange" /><label bind="peers_connected" /></ltd>
-                                                </ltr>
-                                            </lt>
-                                        </dtd>
-                                    </dtr>
-                                    <dtr>
-                                        <dth text="{Speed}" />
-                                        <dtd>
-                                            <lt>
-                                                <ltr>
-                                                    <ltd><icon icon="arrow-down" /><label bind="rate_download" bindtransform="str_fsize" /></ltd>
-                                                    <ltd><icon icon="arrow-up" /><label bind="rate_upload" bindtransform="str_fsize" /></ltd>
-                                                    <ltd><icon icon="time" /><label bind="eta" bindtransform="str" /></ltd>
-                                                </ltr>
-                                            </lt>
-                                        </dtd>
-                                        <dth text="{Time}" />
-                                        <dtd>
-                                            <lt>
-                                                <ltr>
-                                                    <ltd><icon icon="arrow-down" /><label bind="seconds_downloading" bindtransform="str" /></ltd>
-                                                    <ltd><icon icon="arrow-up" /><label bind="seconds_seeding" bindtransform="str" /></ltd>
-                                                </ltr>
-                                            </lt>
-                                        </dtd>
-                                    </dtr>
-                                    <dtr>
-                                        <dth text="{Volume}" />
-                                        <dtd>
-                                            <lt>
-                                                <ltr>
-                                                    <ltd><icon icon="arrow-down" /><label bind="downloaded_ever" bindtransform="str_fsize" /></ltd>
-                                                    <ltd><icon icon="arrow-up" /><label bind="uploaded_ever" bindtransform="str_fsize" /></ltd>
-                                                    <ltd><icon icon="exchange" /><label bind="upload_ratio" /></ltd>
-                                                </ltr>
-                                            </lt>
-                                        </dtd>
-                                        <dth text="{Started at}" />
-                                        <dtd>
-                                            <label bind="start_date" bindtransform="lambda d: d and d.strftime('%b %d %Y, %H:%M')" />
-                                        </dtd>
-                                    </dtr>
-                                    <dtr>
-                                        <dth text="{Size}" />
-                                        <dtd>
-                                            <lt>
-                                                <ltr>
-                                                    <ltd>
-                                                        <icon icon="download" /><label bind="size_now" bindtransform="str_fsize" />
-                                                    </ltd>
+                                                <ltd>
+                                                    <togglebutton bind:pressed="bandwidth_priority" bindtransform="lambda s: s == 'low'" style="mini" icon="arrow-down" id="priority_low" />
+                                                    <togglebutton bind:pressed="bandwidth_priority" bindtransform="lambda s: s == 'normal'" style="mini" icon="minus" id="priority_normal" />
+                                                    <togglebutton bind:pressed="bandwidth_priority" bindtransform="lambda s: s == 'high'" style="mini" icon="arrow-up" id="priority_high" />
+                                                </ltd>
+                                            </ltr>
+                                        </lt>
+                                    </dtd>
+                                </dtr>
+                                <dtr>
+                                    <dth text="{Destionation}" />
+                                    <dtd>
+                                        <hc>
+                                            <pathbox directory="True" style="big" bind="download_dir" id="download_dir" />
+                                            <tooltip text="{Move files}"><button style="mini" id="move" icon="ok" /></tooltip>
+                                        </hc>
+                                    </dtd>
+                                    <dth text="{Peers}" />
+                                    <dtd>
+                                        <lt>
+                                            <ltr>
+                                                <ltd><icon icon="arrow-down" /><label bind="peers_sending_to_us" /></ltd>
+                                                <ltd><icon icon="arrow-up" /><label bind="peers_getting_from_us" /></ltd>
+                                                <ltd><icon icon="exchange" /><label bind="peers_connected" /></ltd>
+                                            </ltr>
+                                        </lt>
+                                    </dtd>
+                                </dtr>
+                                <dtr>
+                                    <dth text="{Speed}" />
+                                    <dtd>
+                                        <lt>
+                                            <ltr>
+                                                <ltd><icon icon="arrow-down" /><label bind="rate_download" bindtransform="str_fsize" /></ltd>
+                                                <ltd><icon icon="arrow-up" /><label bind="rate_upload" bindtransform="str_fsize" /></ltd>
+                                                <ltd><icon icon="time" /><label bind="eta" bindtransform="str" /></ltd>
+                                            </ltr>
+                                        </lt>
+                                    </dtd>
+                                    <dth text="{Time}" />
+                                    <dtd>
+                                        <lt>
+                                            <ltr>
+                                                <ltd><icon icon="arrow-down" /><label bind="seconds_downloading" bindtransform="str" /></ltd>
+                                                <ltd><icon icon="arrow-up" /><label bind="seconds_seeding" bindtransform="str" /></ltd>
+                                            </ltr>
+                                        </lt>
+                                    </dtd>
+                                </dtr>
+                                <dtr>
+                                    <dth text="{Volume}" />
+                                    <dtd>
+                                        <lt>
+                                            <ltr>
+                                                <ltd><icon icon="arrow-down" /><label bind="downloaded_ever" bindtransform="str_fsize" /></ltd>
+                                                <ltd><icon icon="arrow-up" /><label bind="uploaded_ever" bindtransform="str_fsize" /></ltd>
+                                                <ltd><icon icon="exchange" /><label bind="upload_ratio" /></ltd>
+                                            </ltr>
+                                        </lt>
+                                    </dtd>
+                                    <dth text="{Started at}" />
+                                    <dtd>
+                                        <label bind="start_date" bindtransform="lambda d: d and d.strftime('%b %d %Y, %H:%M')" />
+                                    </dtd>
+                                </dtr>
+                                <dtr>
+                                    <dth text="{Size}" />
+                                    <dtd>
+                                        <lt>
+                                            <ltr>
+                                                <ltd>
+                                                    <icon icon="download" /><label bind="size_now" bindtransform="str_fsize" />
+                                                </ltd>
 
-                                                    <ltd>
-                                                        <icon icon="hdd" />
-                                                        <label bind="size_when_done" bindtransform="str_fsize" />
-                                                        <label text="/" />
-                                                        <label bind="total_size" bindtransform="str_fsize" />
-                                                    </ltd>
+                                                <ltd>
+                                                    <icon icon="hdd" />
+                                                    <label bind="size_when_done" bindtransform="str_fsize" />
+                                                    <label text="/" />
+                                                    <label bind="total_size" bindtransform="str_fsize" />
+                                                </ltd>
 
-                                                    <ltd>
-                                                        <icon icon="copy" />
-                                                        <label bind="piece_count" />
-                                                        <label text="×" />
-                                                        <label bind="piece_size" bindtransform="str_fsize" />
-                                                    </ltd>
-                                                </ltr>
-                                            </lt>
-                                        </dtd>
-                                        <dth text="{Finished at}" />
-                                        <dtd>
-                                            <label bind="done_date" bindtransform="lambda d: d and d.strftime('%b %d %Y, %H:%M')" />
-                                        </dtd>
-                                    </dtr>
-                                    <dtr>
-                                        <dth text="{Created at}" />
-                                        <dtd><label bind="date_created" bindtransform="lambda d: d and d.strftime('%b %d %Y, %H:%M')" /></dtd>
-                                        <dth text="{Added at}" />
-                                        <dtd><label bind="added_date" bindtransform="lambda d: d and d.strftime('%b %d %Y, %H:%M')" /></dtd>
-                                    </dtr>
-                                </dt>
-                            </bind:dict>
+                                                <ltd>
+                                                    <icon icon="copy" />
+                                                    <label bind="piece_count" />
+                                                    <label text="×" />
+                                                    <label bind="piece_size" bindtransform="str_fsize" />
+                                                </ltd>
+                                            </ltr>
+                                        </lt>
+                                    </dtd>
+                                    <dth text="{Finished at}" />
+                                    <dtd>
+                                        <label bind="done_date" bindtransform="lambda d: d and d.strftime('%b %d %Y, %H:%M')" />
+                                    </dtd>
+                                </dtr>
+                                <dtr>
+                                    <dth text="{Created at}" />
+                                    <dtd><label bind="date_created" bindtransform="lambda d: d and d.strftime('%b %d %Y, %H:%M')" /></dtd>
+                                    <dth text="{Added at}" />
+                                    <dtd><label bind="added_date" bindtransform="lambda d: d and d.strftime('%b %d %Y, %H:%M')" /></dtd>
+                                </dtr>
+                            </dt>
                         </tab>
 
                         <tab title="{Limits}">
-                            <bind:dict bind="torrent">
-                                <formline text="{Download limits}">
-                                    <hc>
-                                        <textbox bind="download_limit" type="number" />
-                                        <checkbox bind="download_limited" text="{Use}" />
-                                    </hc>
-                                </formline>
-                                <formline text="{Upload limits}">
-                                    <hc>
-                                        <textbox bind="upload_limit" type="number" />
-                                        <checkbox bind="upload_limited" text="{Use}" />
-                                    </hc>
-                                </formline>
-                                <formline text="{Ratio limits}">
-                                    <hc>
-                                        <textbox bind="seed_ratio_limit" type="number" />
-                                        <dropdown values="['global', 'single', 'limited']" labels="['Global', 'Single', 'Limited']" bind="seed_ratio_mode" />
-                                    </hc>
-                                </formline>
-                                <formline text="{Global limits}">
-                                    <checkbox bind="honors_session_limits" text="{Honor session limits}" />
-                                </formline>
-                                <formline>
-                                    <button id="apply_limits" text="{Apply changes}" icon="ok" />
-                                </formline>
-                            </bind:dict>
+                            <formline text="{Download limits}">
+                                <hc>
+                                    <textbox bind="download_limit" type="number" />
+                                    <checkbox bind="download_limited" text="{Use}" />
+                                </hc>
+                            </formline>
+                            <formline text="{Upload limits}">
+                                <hc>
+                                    <textbox bind="upload_limit" type="number" />
+                                    <checkbox bind="upload_limited" text="{Use}" />
+                                </hc>
+                            </formline>
+                            <formline text="{Ratio limits}">
+                                <hc>
+                                    <textbox bind="seed_ratio_limit" type="number" />
+                                    <dropdown values="['global', 'single', 'limited']" labels="['Global', 'Single', 'Limited']" bind="seed_ratio_mode" />
+                                </hc>
+                            </formline>
+                            <formline text="{Global limits}">
+                                <checkbox bind="honors_session_limits" text="{Honor session limits}" />
+                            </formline>
+                            <formline>
+                                <button id="apply_limits" text="{Apply changes}" icon="ok" />
+                            </formline>
                         </tab>
 
                         <tab title="{Files}">
@@ -413,15 +409,13 @@
             </formgroup>
         </vc>
 
-        <bind:dict bind="session">
-            <right>
-                <pad>
-                    <label text="Version " /><label bind="version" />
-                    <label text=", API v" /><label bind="rpc_version" />
-                    <label text=", min " /><label bind="rpc_version_minimum" />
-                </pad>
-            </right>
-        </bind:dict>
+        <right binder:context="session">
+            <pad>
+                <label text="Version " /><label bind="version" />
+                <label text=", API v" /><label bind="rpc_version" />
+                <label text=", min " /><label bind="rpc_version_minimum" />
+            </pad>
+        </right>
     </pad>
 
     <dialog visible="False" id="add_dialog" buttons="[
@@ -465,11 +459,10 @@
         </pad>
     </dialog>
 
-    <dialog visible="False" id="session_dialog" buttons="[
+    <dialog visible="False" binder:context="session" id="session_dialog" buttons="[
         {'id': 'apply', 'text': _('Apply')},
         {'id': 'cancel', 'text': _('Cancel')}
         ]">
-        <bind:dict bind="session">
         <pad>
             <formgroup text="{Storage options}">
                 <vc>
@@ -519,13 +512,21 @@
             <formgroup text="{Alternate limits schedule}">
                 <vc>
                     <formline text="{Start time}">
-                        <textbox type="number" bind="alt_speed_time_begin" />
+                        <textbox bind="alt_speed_time_begin" />
                     </formline>
                     <formline text="{End time}">
-                        <textbox type="number" bind="alt_speed_time_end" />
+                        <textbox bind="alt_speed_time_end" />
                     </formline>
-                    <formline text="{Days}">
-                        <textbox type="number" bind="alt_speed_time_day" />
+                    <formline text="{Weekdays}">
+                        <bind:dict bind="alt_speed_time_day">
+                            <checkbox text="{Sunday}" bind="Sun" />
+                            <checkbox text="{Monday}" bind="Mon" />
+                            <checkbox text="{Tuesday}" bind="Tue" />
+                            <checkbox text="{Wednesday}" bind="Wed" />
+                            <checkbox text="{Thursday}" bind="Thu" />
+                            <checkbox text="{Friday}" bind="Fri" />
+                            <checkbox text="{Saturday}" bind="Sat" />
+                        </bind:dict>
                     </formline>
                     <formline text="{Enabled}">
                         <checkbox text="{Active}" bind="alt_speed_time_enabled" />
@@ -568,7 +569,6 @@
                 </vc>
             </formgroup>
         </pad>
-        </bind:dict>
     </dialog>
 
 </body>
