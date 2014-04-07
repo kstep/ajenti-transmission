@@ -47,6 +47,7 @@ class TransmissionPlugin (SectionPlugin):
                 peers=[],
                 pieces=[],
                 trackers=[],
+                session=Session.EMPTY,
                 files=[])
 
         def post_item_bind(root, collection, value, ui):
@@ -73,8 +74,7 @@ class TransmissionPlugin (SectionPlugin):
         self._client = Client(**self.classconfig)
 
         try:
-            self.session = self._client.session_get()
-            self.session_binder = Binder(self.session, self.find('session_dialog'))
+            self.scope.session = self._client.session_get()
             self.binder = Binder(self.scope, self.find('main'))
             self.refresh()
 
@@ -139,6 +139,7 @@ class TransmissionPlugin (SectionPlugin):
         self.scope.torrents = self._client.torrent_get(fields=['id', 'name', 'sizeWhenDone', 'leftUntilDone',
             'percentDone', 'bandwidthPriority', 'totalSize', 'eta', 'status', 'error', 'errorString',
             'peersSendingToUs', 'peersGettingFromUs', 'uploadRatio', 'rateDownload', 'rateUpload', 'recheckProgress'])
+        self.scope.session = self._client.session_get()
 
         for t in self.scope.torrents:
             if t.error:
@@ -233,9 +234,13 @@ class TransmissionPlugin (SectionPlugin):
 
     @on('config', 'click')
     def open_config_dialog(self):
-        self.session.update(self._client.session_get())
-        self.session_binder.populate()
         self.find('session_dialog').visible = True
+
+    @on('alt_speed', 'click')
+    def toggle_alt_speed(self):
+        alt_speed = self.scope.session.alt_speed_enabled = not self.scope.session.alt_speed_enabled
+        self._client.session_set(alt_speed_enabled=alt_speed)
+        self.binder.populate()
 
     @on('session_dialog', 'button')
     def submit_config_dialog(self, button):
@@ -243,31 +248,31 @@ class TransmissionPlugin (SectionPlugin):
         dialog.visible = False
 
         if button == 'apply':
-            self.session_binder.update()
+            self.binder.update()
             self._client.session_set(
-                    alt_speed_down=self.session.alt_speed_down,
-                    alt_speed_up=self.session.alt_speed_up,
-                    alt_speed_enabled=self.session.alt_speed_enabled,
-                    alt_speed_time_begin=self.session.alt_speed_time_begin,
-                    alt_speed_time_end=self.session.alt_speed_time_end,
-                    alt_speed_time_day=self.session.alt_speed_time_day,
-                    dht_enabled=self.session.dht_enabled,
-                    pex_enabled=self.session.pex_enabled,
-                    encryption=self.session.encryption,
-                    download_dir=self.session.download_dir,
+                    alt_speed_down=self.scope.session.alt_speed_down,
+                    alt_speed_up=self.scope.session.alt_speed_up,
+                    alt_speed_enabled=self.scope.session.alt_speed_enabled,
+                    alt_speed_time_begin=self.scope.session.alt_speed_time_begin,
+                    alt_speed_time_end=self.scope.session.alt_speed_time_end,
+                    alt_speed_time_day=self.scope.session.alt_speed_time_day,
+                    dht_enabled=self.scope.session.dht_enabled,
+                    pex_enabled=self.scope.session.pex_enabled,
+                    encryption=self.scope.session.encryption,
+                    download_dir=self.scope.session.download_dir,
 
-                    peer_limit_global=self.session.peer_limit_global,
-                    peer_limit_per_torrent=self.session.peer_limit_per_torrent,
-                    peer_port=self.session.peer_port,
-                    peer_port_random_on_start=self.session.peer_port_random_on_start,
-                    port_forwarding_enabled=self.session.port_forwarding_enabled,
+                    peer_limit_global=self.scope.session.peer_limit_global,
+                    peer_limit_per_torrent=self.scope.session.peer_limit_per_torrent,
+                    peer_port=self.scope.session.peer_port,
+                    peer_port_random_on_start=self.scope.session.peer_port_random_on_start,
+                    port_forwarding_enabled=self.scope.session.port_forwarding_enabled,
 
-                    seedRatioLimit=self.session.seed_ratio_limit,
-                    seedRatioLimited=self.session.seed_ratio_limited,
-                    speed_limit_down=self.session.speed_limit_down,
-                    speed_limit_up=self.session.speed_limit_up,
-                    speed_limit_down_enabled=self.session.speed_limit_down_enabled,
-                    speed_limit_up_enabled=self.session.speed_limit_up_enabled,
+                    seedRatioLimit=self.scope.session.seed_ratio_limit,
+                    seedRatioLimited=self.scope.session.seed_ratio_limited,
+                    speed_limit_down=self.scope.session.speed_limit_down,
+                    speed_limit_up=self.scope.session.speed_limit_up,
+                    speed_limit_down_enabled=self.scope.session.speed_limit_down_enabled,
+                    speed_limit_up_enabled=self.scope.session.speed_limit_up_enabled,
                     )
 
     @on('add', 'click')

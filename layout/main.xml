@@ -1,5 +1,5 @@
-<body>
-    <pad id="main">
+<body id="main">
+    <pad>
 
         <right>
             <hc>
@@ -12,6 +12,12 @@
             <button id="refresh" icon="refresh" text="{Refresh}" style="mini" />
             <button id="add" text="{Add torrent}" icon="download-alt" style="mini" />
             <button id="config" text="{Session config}" icon="cogs" style="mini" />
+
+            <bind:dict bind="session">
+            <indent>
+                <togglebutton id="alt_speed" icon="pushpin" bind:pressed="alt_speed_enabled" style="mini" text="{Alt speed}" />
+            </indent>
+            </bind:dict>
         </hc>
 
         <vc>
@@ -413,6 +419,7 @@
         {'id': 'apply', 'text': _('Apply')},
         {'id': 'cancel', 'text': _('Cancel')}
         ]">
+        <bind:dict bind="session">
         <pad>
             <formgroup text="{Storage options}">
                 <vc>
@@ -511,6 +518,7 @@
                 </vc>
             </formgroup>
         </pad>
+        </bind:dict>
     </dialog>
 
 </body>
