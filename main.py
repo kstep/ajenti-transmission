@@ -162,6 +162,18 @@ class TransmissionPlugin (SectionPlugin):
         except IndexError:
             pass
 
+    @on('priority_low', 'click')
+    def set_priority_low(self):
+        self.set_priority(self.scope.torrent, -1)
+
+    @on('priority_normal', 'click')
+    def set_priority_normal(self):
+        self.set_priority(self.scope.torrent, 0)
+
+    @on('priority_high', 'click')
+    def set_priority_high(self):
+        self.set_priority(self.scope.torrent, 1)
+
     def set_priority(self, item, value):
         self._client.torrent_set(ids=[item.id], bandwidthPriority=value)
         self.refresh_item(item)
@@ -205,7 +217,7 @@ class TransmissionPlugin (SectionPlugin):
             'peersSendingToUs', 'peersGettingFromUs', 'peersConnected',
             'bandwidthPriority', 'secondsDownloading', 'secondsSeeding',
             'downloadedEver', 'uploadedEver', 'uploadRatio', 'peers', 'pieces', 'pieceCount',
-            'sizeWhenDone', 'totalSize', 'eta', 'rateUpload', 'rateDownload',
+            'pieceSize', 'sizeWhenDone', 'leftUntilDone', 'totalSize', 'eta', 'rateUpload', 'rateDownload',
             'addedDate', 'dateCreated', 'startDate', 'doneDate',
             'trackers',  # 'trackerStats',
             #'lastAnnounceTime', 'lastScrapeTime', 'announceURL', 'scrapeURL',

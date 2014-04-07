@@ -124,8 +124,16 @@ class File(TorrentModel):
             #'name': str,
             }
 
+    _defaults = {
+            'bytes_completed': 0,
+            'length': 0,
+            }
+
     def _init(self):
-        self.percent_done = self.bytes_completed / self.length
+        try:
+            self.percent_done = self.bytes_completed / self.length
+        except ZeroDivisionError:
+            self.percent_done = 0.0
 
 class FileStat(TorrentModel):
     _casts = {
@@ -162,6 +170,11 @@ class Peer(TorrentModel):
             #'progress': float,
             #'rateToClient': int,
             #'rateToPeer': int,
+            }
+
+    _defaults = {
+            'rate_to_client': 0,
+            'rate_to_peer': 0,
             }
 
 class Tracker(TorrentModel):
@@ -283,6 +296,17 @@ class Torrent(TorrentModel):
     _defaults = {
             'files': [],
             'peers': [],
+            'trackers': [],
+            'tracker_stats': [],
+            'piece_count': 0,
+            'piece_size': 0,
+            'downloaded_ever': 0,
+            'uploaded_ever': 0,
+            'size_now': 0,
+            'size_when_done': 0,
+            'total_size': 0,
+            'rate_download': 0,
+            'rate_upload': 0,
             'id': None,
             }
 
@@ -302,18 +326,76 @@ class Torrent(TorrentModel):
         if 'pieces' in self and 'piece_count' in self:
             self.pieces.bitlen = self.piece_count
 
-class SessionStat(TorrentModel):
-    pass
+class WeekDays(object):
+    MASKS = {'Sun': 1, 'Mon': 2, 'Tue': 4, 'Wed': 8, 'Thu': 16, 'Fri': 32, 'Sat': 64}
+
+    def __init__(self, bits=127):
+        self.value = bits
+
+    def __getitem__(self, name):
+        return (self.value & self.MASKS[name]) != 0
+
+    def __setitem__(self, name, value):
+        value = -int(bool(value))
+        mask = self.MASKS[name]
+
+        self.value = (self.value & ~mask) | (mask & value)
+
+    def __int__(self):
+        return self.value
+
+    def __str__(self):
+        return ', '.join(dow for dow, mask in self.MASKS.iteritems() if self.value & mask != 0)
 
 class Session(TorrentModel):
+    _casts = {
+            #'alt-speed-down': int,
+            #'alt-speed-enabled': bool,
+            #'alt-speed-time-begin': unixtime,
+            #'alt-speed-time-enabled': bool,
+            #'alt-speed-time-end': unixtime,
+            #'alt-speed-time-day': WeekDays,
+            #'alt-speed-up': int,
+            #'blocklist-enabled': bool,
+            #'blocklist-size': int,
+            #'dht-enabled': bool,
+            #'encryption': str,
+            #'download-dir': str,
+            #'peer-limit-global': int,
+            #'peer-limit-per-torrent': int,
+            #'pex-enabled': bool,
+            #'peer-port': int,
+            #'peer-port-random-on-start': bool,
+            #'port-forwarding-enabled': bool,
+            #'rpc-version': int,
+            #'rpc-version-minimum': int,
+            #'seedRatioLimit': float,
+            #'seedRatioLimited': bool,
+            #'speed-limit-down': int,
+            #'speed-limit-down-enabled': bool,
+            #'speed-limit-up': int,
+            #'speed-limit-up-enabled': bool,
+            #'version': str,
+        }
+
+class SessionStat(TorrentModel):
+    class Stats(TorrentModel):
+        _casts = {
+            #'uploadedBytes': int,
+            #'downloadedBytes': int,
+            #'filesAdded': int,
+            #'sessionCount': int,
+            'secondsActive': timedelta,
+            }
+
     _casts = {
             #'activeTorrentCount': int,
             #'downloadSpeed': int,
             #'pausedTorrentCount': int,
             #'torrentCount': int,
             #'uploadSpeed': int,
-            'cumulative-stats': SessionStat,
-            'current-stats': SessionStat,
+            'cumulative-stats': Stats,
+            'current-stats': Stats,
             }
 
 class Result(TorrentModel):

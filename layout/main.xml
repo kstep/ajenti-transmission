@@ -49,16 +49,16 @@
                                     <ltr bind:visible="status" bindtransform="lambda s: s == 'downloading'">
                                         <ltd>
                                             <icon icon="hdd" />
-                                            <label style="small" bind="size_now" bindtransform="lambda s: str_fsize(s or 0)" />
+                                            <label style="small" bind="size_now" bindtransform="str_fsize" />
                                             <label style="small" text="/" />
-                                            <label style="small" bind="size_when_done" bindtransform="lambda s: str_fsize(s or 0)" />
+                                            <label style="small" bind="size_when_done" bindtransform="str_fsize" />
                                         </ltd>
 
                                         <ltd>
                                             <icon icon="arrow-down" />
                                             <label style="small" bind="peers_sending_to_us" />
                                             <label style="small" text="@" />
-                                            <label style="small" bind="rate_download" bindtransform="lambda s: str_fsize(s or 0)" />
+                                            <label style="small" bind="rate_download" bindtransform="str_fsize" />
                                         </ltd>
 
                                         <ltd>
@@ -70,14 +70,14 @@
                                     <ltr bind:visible="status" bindtransform="lambda s: s == 'seeding'">
                                         <ltd>
                                             <icon icon="hdd" />
-                                            <label style="small" bind="size_now" bindtransform="lambda s: str_fsize(s or 0)" />
+                                            <label style="small" bind="size_now" bindtransform="str_fsize" />
                                         </ltd>
 
                                         <ltd>
                                             <icon icon="arrow-up" />
                                             <label style="small" bind="peers_getting_from_us" />
                                             <label style="small" text="@" />
-                                            <label style="small" bind="rate_upload" bindtransform="lambda s: str_fsize(s or 0)" />
+                                            <label style="small" bind="rate_upload" bindtransform="str_fsize" />
                                         </ltd>
 
                                         <ltd>
@@ -89,7 +89,7 @@
                                     <ltr bind:visible="status" bindtransform="lambda s: s == 'checking'">
                                         <ltd>
                                             <icon icon="hdd" />
-                                            <label style="small" bind="size_now" bindtransform="lambda s: str_fsize(s or 0)" />
+                                            <label style="small" bind="size_now" bindtransform="str_fsize" />
                                         </ltd>
 
                                         <ltd>
@@ -104,9 +104,9 @@
                                     <ltr bind:visible="status" bindtransform="lambda s: s == 'stopped'">
                                         <ltd>
                                             <icon icon="hdd" />
-                                            <label style="small" bind="size_now" bindtransform="lambda s: str_fsize(s or 0)" />
+                                            <label style="small" bind="size_now" bindtransform="str_fsize" />
                                             <label style="small" text="/" />
-                                            <label style="small" bind="size_when_done" bindtransform="lambda s: str_fsize(s or 0)" />
+                                            <label style="small" bind="size_when_done" bindtransform="str_fsize" />
                                         </ltd>
                                     </ltr>
                                 </lt>
@@ -142,7 +142,7 @@
                             <bind:dict bind="torrent" id="torrent">
                                 <dt>
                                     <dtr>
-                                        <dth text="{Name}" width="120" />
+                                        <dth text="{Name}" width="90" />
                                         <dtd>
                                             <collapse>
                                                 <label bind="name" />
@@ -150,7 +150,21 @@
                                             </collapse>
                                         </dtd>
                                         <dth text="{Priority}" />
-                                        <dtd><label bind="bandwidth_priority" /></dtd>
+                                        <dtd>
+                                            <lt>
+                                                <ltr>
+                                                    <ltd>
+                                                        <label bind="bandwidth_priority" />
+                                                    </ltd>
+
+                                                    <ltd>
+                                                        <togglebutton bind:pressed="bandwidth_priority" bindtransform="lambda s: s == 'low'" style="mini" icon="arrow-down" id="priority_low" />
+                                                        <togglebutton bind:pressed="bandwidth_priority" bindtransform="lambda s: s == 'normal'" style="mini" icon="minus" id="priority_normal" />
+                                                        <togglebutton bind:pressed="bandwidth_priority" bindtransform="lambda s: s == 'high'" style="mini" icon="arrow-up" id="priority_high" />
+                                                    </ltd>
+                                                </ltr>
+                                            </lt>
+                                        </dtd>
                                     </dtr>
                                     <dtr>
                                         <dth text="{Destionation}" />
@@ -176,8 +190,8 @@
                                         <dtd>
                                             <lt>
                                                 <ltr>
-                                                    <ltd><icon icon="arrow-down" /><label bind="rate_download" bindtransform="lambda s: str_fsize(s or 0)" /></ltd>
-                                                    <ltd><icon icon="arrow-up" /><label bind="rate_upload" bindtransform="lambda s: str_fsize(s or 0)" /></ltd>
+                                                    <ltd><icon icon="arrow-down" /><label bind="rate_download" bindtransform="str_fsize" /></ltd>
+                                                    <ltd><icon icon="arrow-up" /><label bind="rate_upload" bindtransform="str_fsize" /></ltd>
                                                     <ltd><icon icon="time" /><label bind="eta" bindtransform="str" /></ltd>
                                                 </ltr>
                                             </lt>
@@ -197,35 +211,49 @@
                                         <dtd>
                                             <lt>
                                                 <ltr>
-                                                    <ltd><icon icon="arrow-down" /><label bind="downloaded_ever" bindtransform="lambda s: str_fsize(s or 0)" /></ltd>
-                                                    <ltd><icon icon="arrow-up" /><label bind="uploaded_ever" bindtransform="lambda s: str_fsize(s or 0)" /></ltd>
+                                                    <ltd><icon icon="arrow-down" /><label bind="downloaded_ever" bindtransform="str_fsize" /></ltd>
+                                                    <ltd><icon icon="arrow-up" /><label bind="uploaded_ever" bindtransform="str_fsize" /></ltd>
+                                                    <ltd><icon icon="download" /><label bind="size_now" bindtransform="str_fsize" /></ltd>
                                                     <ltd><icon icon="exchange" /><label bind="upload_ratio" /></ltd>
                                                 </ltr>
                                             </lt>
                                         </dtd>
-                                        <dth text="{Size}" />
+                                        <dth text="{Started at}" />
                                         <dtd>
-                                            <label bind="total_size" bindtransform="lambda s: str_fsize(s or 0)" />
-                                            <label text=", selected " />
-                                            <label bind="size_when_done" bindtransform="lambda s: str_fsize(s or 0)" />
+                                            <label bind="start_date" bindtransform="lambda d: d and d.strftime('%b %d %Y, %H:%M')" />
                                         </dtd>
                                     </dtr>
                                     <dtr>
-                                        <dth text="{Timestamps}" />
+                                        <dth text="{Size}" />
                                         <dtd>
                                             <lt>
                                                 <ltr>
-                                                    <ltd><label style="bold" text="{Created }" /><label bind="date_created" bindtransform="lambda d: d and d.strftime('%b %d %Y, %H:%M')" /></ltd>
-                                                    <ltd><label style="bold" text="{Added }" /><label bind="added_date" bindtransform="lambda d: d and d.strftime('%b %d %Y, %H:%M')" /></ltd>
+                                                    <ltd>
+                                                        <icon icon="hdd" />
+                                                        <label bind="size_when_done" bindtransform="str_fsize" />
+                                                        <label text="/" />
+                                                        <label bind="total_size" bindtransform="str_fsize" />
+                                                    </ltd>
+
+                                                    <ltd>
+                                                        <icon icon="copy" />
+                                                        <label bind="piece_count" />
+                                                        <label text="×" />
+                                                        <label bind="piece_size" bindtransform="str_fsize" />
+                                                    </ltd>
                                                 </ltr>
                                             </lt>
                                         </dtd>
-                                        <dth text="{Run date}" />
+                                        <dth text="{Finished at}" />
                                         <dtd>
-                                            <hc>
-                                                <label bind="start_date" bindtransform="lambda d: d and d.strftime('%b %d %Y, %H:%M')" /><label text=" — " /><label bind="done_date" bindtransform="lambda d: d and d.strftime('%b %d %Y, %H:%M')" />
-                                            </hc>
+                                            <label bind="done_date" bindtransform="lambda d: d and d.strftime('%b %d %Y, %H:%M')" />
                                         </dtd>
+                                    </dtr>
+                                    <dtr>
+                                        <dth text="{Created at}" />
+                                        <dtd><label bind="date_created" bindtransform="lambda d: d and d.strftime('%b %d %Y, %H:%M')" /></dtd>
+                                        <dth text="{Added at}" />
+                                        <dtd><label bind="added_date" bindtransform="lambda d: d and d.strftime('%b %d %Y, %H:%M')" /></dtd>
                                     </dtr>
                                 </dt>
                             </bind:dict>
@@ -277,7 +305,7 @@
                                     <dtr>
                                         <dtd><checkbox bind="wanted" /></dtd>
                                         <dtd><label bind="name" /></dtd>
-                                        <dtd><label bind="bytes_completed" bindtransform="lambda s: str_fsize(s or 0)" /><label text=" / " /><label bind="length" bindtransform="lambda s: str_fsize(s or 0)" /></dtd>
+                                        <dtd><label bind="bytes_completed" bindtransform="str_fsize" /><label text=" / " /><label bind="length" bindtransform="str_fsize" /></dtd>
                                         <dtd>
                                             <hc>
                                                 <label bind="percent_done" bindtransform="lambda x: '%0.2f%%' % (x * 100)" style="mini" />
@@ -330,8 +358,8 @@
                                         <dtd>
                                             <lt>
                                                 <ltr>
-                                                    <ltd><icon icon="arrow-down" /><label bind="rate_to_client" bindtransform="lambda s: str_fsize(s or 0)" /></ltd>
-                                                    <ltd><icon icon="arrow-up" /><label bind="rate_to_peer" bindtransform="lambda s: str_fsize(s or 0)" /></ltd>
+                                                    <ltd><icon icon="arrow-down" /><label bind="rate_to_client" bindtransform="str_fsize" /></ltd>
+                                                    <ltd><icon icon="arrow-up" /><label bind="rate_to_peer" bindtransform="str_fsize" /></ltd>
                                                 </ltr>
                                             </lt>
                                         </dtd>
