@@ -327,17 +327,24 @@ class Torrent(TorrentModel):
             self.pieces.bitlen = self.piece_count
 
 class WeekDays(object):
-    MASKS = {'Sun': 1, 'Mon': 2, 'Tue': 4, 'Wed': 8, 'Thu': 16, 'Fri': 32, 'Sat': 64}
+    MASKS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 
     def __init__(self, bits=127):
         self.value = bits
 
     def __getitem__(self, name):
-        return (self.value & self.MASKS[name]) != 0
+        try:
+            return (self.value & (1 << self.MASKS.index(name))) != 0
+        except ValueError:
+            raise KeyError(name)
 
     def __setitem__(self, name, value):
         value = -int(bool(value))
-        mask = self.MASKS[name]
+
+        try:
+            mask = 1 << self.MASKS.index(name)
+        except ValueError:
+            raise KeyError(name)
 
         self.value = (self.value & ~mask) | (mask & value)
 
@@ -351,7 +358,7 @@ class WeekDays(object):
         return self.value
 
     def __str__(self):
-        return ', '.join(dow for dow, mask in self.MASKS.iteritems() if self.value & mask != 0)
+        return ', '.join(dow for mask, dow in enumerate(self.MASKS) if self.value & (1 << mask) != 0)
 
     def __repr__(self):
         return '<WeekDays: [%s]>' % str(self)
