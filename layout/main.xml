@@ -618,18 +618,22 @@
                             </dtr>
 
                             <dtr>
-                                <dth text="{Files added}" />
-                                <dtd><icon icon="copy" /><label bind="files_added" /></dtd>
-                            </dtr>
-
-                            <dtr>
-                                <dth text="{Session count}" />
-                                <dtd><icon icon="cog" /><label bind="session_count" /></dtd>
-                            </dtr>
-
-                            <dtr>
-                                <dth text="{Active time}" />
-                                <dtd><icon icon="time" /><label bind="seconds_active" bindtransform="str" /></dtd>
+                                <dth text="{Counts}" />
+                                <dtd>
+                                    <lt>
+                                        <ltr>
+                                            <ltd>
+                                                <tooltip text="{Added files}"><icon icon="file" /><label bind="files_added" /></tooltip>
+                                            </ltd>
+                                            <ltd>
+                                                <tooltip text="{Sessions}"><icon icon="cog" /><label bind="session_count" /></tooltip>
+                                            </ltd>
+                                            <ltd>
+                                                <tooltip text="{Active time}"><icon icon="time" /><label bind="seconds_active" bindtransform="str" /></tooltip>
+                                            </ltd>
+                                        </ltr>
+                                    </lt>
+                                </dtd>
                             </dtr>
                         </dt>
                     </bind:dict>
@@ -650,18 +654,22 @@
                             </dtr>
 
                             <dtr>
-                                <dth text="{Files added}" />
-                                <dtd><icon icon="copy" /><label bind="files_added" /></dtd>
-                            </dtr>
-
-                            <dtr>
-                                <dth text="{Session count}" />
-                                <dtd><icon icon="cog" /><label bind="session_count" /></dtd>
-                            </dtr>
-
-                            <dtr>
-                                <dth text="{Active time}" />
-                                <dtd><icon icon="time" /><label bind="seconds_active" bindtransform="str" /></dtd>
+                                <dth text="{Counts}" />
+                                <dtd>
+                                    <lt>
+                                        <ltr>
+                                            <ltd>
+                                                <tooltip text="{Added files}"><icon icon="file" /><label bind="files_added" /></tooltip>
+                                            </ltd>
+                                            <ltd>
+                                                <tooltip text="{Sessions}"><icon icon="cog" /><label bind="session_count" /></tooltip>
+                                            </ltd>
+                                            <ltd>
+                                                <tooltip text="{Active time}"><icon icon="time" /><label bind="seconds_active" bindtransform="str" /></tooltip>
+                                            </ltd>
+                                        </ltr>
+                                    </lt>
+                                </dtd>
                             </dtr>
                         </dt>
                     </bind:dict>
