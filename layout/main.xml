@@ -38,8 +38,11 @@
                 </dt>
                 <bind:template>
                     <dtr>
-                        <dtd><tooltip bind="status"><icon bind="icon" /></tooltip></dtd>
                         <dtd>
+                            <tooltip bind="status"><icon bind="icon" /></tooltip>
+                        </dtd>
+                        <dtd>
+                            <right bind:visible="error" bindtransform="bool"><tooltip bind="error_string"><icon icon="exclamation-sign" /></tooltip></right>
                             <collapse>
                                 <button id="details" style="link" bind:text="name" />
 

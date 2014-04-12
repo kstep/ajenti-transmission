@@ -308,6 +308,8 @@ class Torrent(TorrentModel):
             'rate_download': 0,
             'rate_upload': 0,
             'id': None,
+            'error': 0,
+            'errorString': '',
             }
 
     def _init(self):
