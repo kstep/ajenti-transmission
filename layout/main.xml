@@ -336,14 +336,17 @@
                                     <dtr>
                                         <dtd>
                                             <hc>
-                                                <tooltip text="{I'm choked}"><icon icon="pause" bind:visible="client_is_choked" /></tooltip>
-                                                <tooltip text="{Peer is choked}"><icon icon="stop" bind:visible="peer_is_choked" /></tooltip>
-                                                <tooltip text="{I'm interested}"><icon icon="circle-arrow-down" bind:visible="client_is_interesed" /></tooltip>
-                                                <tooltip text="{Peer is interested}"><icon icon="circle-arrow-up" bind:visible="peer_is_interesed" /></tooltip>
                                                 <tooltip text="{Downloading}"><icon icon="download-alt" bind:visible="is_downloading_from" /></tooltip>
                                                 <tooltip text="{Uploading}"><icon icon="upload-alt" bind:visible="is_uploading_to" /></tooltip>
+
                                                 <tooltip text="{μTP}"><icon icon="exchange" bind:visible="is_u_t_p" /></tooltip>
                                                 <tooltip text="{Encrypted}"><icon icon="lock" bind:visible="is_encrypted" /></tooltip>
+
+                                                <tooltip text="{I'm interested}"><icon icon="circle-arrow-down" bind:visible="client_is_interesed" /></tooltip>
+                                                <tooltip text="{Peer is interested}"><icon icon="circle-arrow-up" bind:visible="peer_is_interesed" /></tooltip>
+
+                                                <tooltip text="{I'm choked}"><icon icon="pause" bind:visible="client_is_choked" /></tooltip>
+                                                <tooltip text="{Peer is choked}"><icon icon="stop" bind:visible="peer_is_choked" /></tooltip>
                                             </hc>
                                         </dtd>
                                         <dtd>
