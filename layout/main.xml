@@ -628,18 +628,16 @@
                                 <dtd>
                                     <lt>
                                         <ltr>
-                                            <ltd>
-                                                <tooltip text="{Added files}"><icon icon="file" /><label bind="files_added" /></tooltip>
-                                            </ltd>
-                                            <ltd>
-                                                <tooltip text="{Sessions}"><icon icon="cog" /><label bind="session_count" /></tooltip>
-                                            </ltd>
-                                            <ltd>
-                                                <tooltip text="{Active time}"><icon icon="time" /><label bind="seconds_active" bindtransform="str" /></tooltip>
-                                            </ltd>
+                                            <ltd><tooltip text="{Files added}"><icon icon="file" /><label bind="files_added" /></tooltip></ltd>
+                                            <ltd><tooltip text="{Session count}"><icon icon="cog" /><label bind="session_count" /></tooltip></ltd>
                                         </ltr>
                                     </lt>
                                 </dtd>
+                            </dtr>
+
+                            <dtr>
+                                <dth text="{Active time}" />
+                                <dtd><icon icon="time" /><label bind="seconds_active" bindtransform="str" /></dtd>
                             </dtr>
                         </dt>
                     </bind:dict>
@@ -664,18 +662,16 @@
                                 <dtd>
                                     <lt>
                                         <ltr>
-                                            <ltd>
-                                                <tooltip text="{Added files}"><icon icon="file" /><label bind="files_added" /></tooltip>
-                                            </ltd>
-                                            <ltd>
-                                                <tooltip text="{Sessions}"><icon icon="cog" /><label bind="session_count" /></tooltip>
-                                            </ltd>
-                                            <ltd>
-                                                <tooltip text="{Active time}"><icon icon="time" /><label bind="seconds_active" bindtransform="str" /></tooltip>
-                                            </ltd>
+                                            <ltd><tooltip text="{Files added}"><icon icon="file" /><label bind="files_added" /></tooltip></ltd>
+                                            <ltd><tooltip text="{Session count}"><icon icon="cog" /><label bind="session_count" /></tooltip></ltd>
                                         </ltr>
                                     </lt>
                                 </dtd>
+                            </dtr>
+
+                            <dtr>
+                                <dth text="{Active time}" />
+                                <dtd><icon icon="time" /><label bind="seconds_active" bindtransform="str" /></dtd>
                             </dtr>
                         </dt>
                     </bind:dict>
