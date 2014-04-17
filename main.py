@@ -97,6 +97,9 @@ class TransmissionPlugin (SectionPlugin):
             self.binder = Binder(self.scope, self.find('main'))
             self.binder.populate()
 
+            if not self.scope.session.port_is_open:
+                self.context.notify('error', 'Peer port %s is closed' % self.scope.session.peer_port)
+
         except ConnectionError, e:
             self.context.notify('error', str(e))
             self.context.launch('configure-plugin', plugin=self)
