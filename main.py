@@ -90,6 +90,7 @@ class TransmissionPlugin (SectionPlugin):
 
         try:
             self.scope.session = self._client.session_get()
+            self.scope.session.port_is_open = self._client.port_test()
             self.scope.session_stats = self._client.session_stats()
             self.scope.torrents = self._client.torrent_get(fields=self.TORRENT_FIELDS)
             self.scope.torrent = self._client.torrent_get(fields=self.TORRENT_FIELDS_DETAILED)[0]
@@ -156,6 +157,7 @@ class TransmissionPlugin (SectionPlugin):
     def refresh(self):
         self.scope.torrents[:] = self._client.torrent_get(fields=self.TORRENT_FIELDS)
         self.scope.session.update(self._client.session_get())
+        self.scope.session.port_is_open = self._client.port_test()
 
         for t in self.scope.torrents:
             if t.error:

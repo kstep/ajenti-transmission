@@ -564,7 +564,10 @@
                         <dropdown values="['required', 'preferred', 'tolerated']" labels="['Required', 'Preferred', 'Tolerated']" bind="encryption" />
                     </formline>
                     <formline text="{Peer port}">
-                        <textbox type="number" bind="peer_port" />
+                        <hc>
+                            <textbox type="number" bind="peer_port" />
+                            <icon bind="port_is_open" bindtransform="lambda v: 'ok' if v else 'ban-circle'" />
+                        </hc>
                         <checkbox text="{Randomize on start}" bind="peer_port_random_on_start" />
                     </formline>
                     <formline text="{Port forwarding}">
