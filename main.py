@@ -132,7 +132,7 @@ class TransmissionPlugin (SectionPlugin):
 
         files_wanted, files_unwanted = [], []
         priority_low, priority_normal, priority_high = [], [], []
-        for file in self.scope.files:
+        for file in self.scope.torrent.files:
             (files_wanted if file.wanted else files_unwanted).append(file.id)
             (priority_low if file.priority == 'low' else
              priority_high if file.priority == 'high' else
