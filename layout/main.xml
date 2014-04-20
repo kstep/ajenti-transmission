@@ -120,7 +120,7 @@
                             </hc>
                         </dtd>
                         <dtd>
-                            <tooltip text="{Toggle priority}"><button style="link" bind:text="bandwidth_priority" id="toggle_priority" /></tooltip>
+                            <slider bind="bandwidth_priority" width="50" minvalue="-1" maxvalue="1" id="set_priority" />
                         </dtd>
                         <dtd>
                             <hc>
@@ -154,13 +154,11 @@
                                         <lt>
                                             <ltr>
                                                 <ltd>
-                                                    <label bind="bandwidth_priority" />
+                                                    <label bind="bandwidth_priority" bindtransform="{-1: 'low', 0: 'normal', 1: 'high'}.get" />
                                                 </ltd>
 
                                                 <ltd>
-                                                    <togglebutton bind:pressed="bandwidth_priority" bindtransform="lambda s: s == 'low'" style="mini" icon="arrow-down" id="priority_low" />
-                                                    <togglebutton bind:pressed="bandwidth_priority" bindtransform="lambda s: s == 'normal'" style="mini" icon="minus" id="priority_normal" />
-                                                    <togglebutton bind:pressed="bandwidth_priority" bindtransform="lambda s: s == 'high'" style="mini" icon="arrow-up" id="priority_high" />
+                                                    <slider bind="bandwidth_priority" width="60" id="set_priority" maxvalue="1" minvalue="-1" />
                                                 </ltd>
                                             </ltr>
                                         </lt>
@@ -313,11 +311,7 @@
                                             </hc>
                                         </dtd>
                                         <dtd>
-                                            <hc>
-                                                <tooltip text="Low priority"><togglebutton id="priority_low" bind:pressed="priority" bindtransform="lambda p: p == 'low'" icon="arrow-down" style="mini" /></tooltip>
-                                                <tooltip text="Normal priority"><togglebutton id="priority_normal" bind:pressed="priority" bindtransform="lambda p: p == 'normal'" icon="minus" style="mini" /></tooltip>
-                                                <tooltip text="High priority"><togglebutton id="priority_high" bind:pressed="priority" bindtransform="lambda p: p == 'high'" icon="arrow-up" style="mini" /></tooltip>
-                                            </hc>
+                                            <slider minvalue="-1" maxvalue="1" bind="priority" width="50" />
                                         </dtd>
                                     </dtr>
                                 </bind:template>
@@ -453,7 +447,7 @@
                         <pathbox id="target_dir" directory="True" />
                     </formline>
                     <formline text="{Priority}">
-                        <dropdown labels="['Low', 'Normal', 'High']" values="[-1, 0, 1]" id="priority" />
+                        <slider id="priority" minvalue="-1" maxvalue="1" width="60" />
                     </formline>
                     <formline>
                         <checkbox text="{Pause on add}" id="add_paused" value="True" />

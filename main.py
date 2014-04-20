@@ -65,7 +65,7 @@ class TransmissionPlugin (SectionPlugin):
         self.scope = Scope()
 
         def post_item_bind(root, collection, value, ui):
-            ui.find('toggle_priority').on('click', self.toggle_priority, value)
+            ui.find('set_priority').on('change', self.set_priority, value)
             ui.find('start').on('click', self.start, value)
             ui.find('stop').on('click', self.stop, value)
             ui.find('details').on('click', self.details, value)
@@ -73,14 +73,6 @@ class TransmissionPlugin (SectionPlugin):
 
         self.find('torrents').post_item_bind = post_item_bind
         self.find('torrents').delete_item = self.remove
-
-
-        def post_file_bind(root, collection, value, ui):
-            ui.find('priority_low').on('click', self.set_file_priority, value, 'low')
-            ui.find('priority_normal').on('click', self.set_file_priority, value, 'normal')
-            ui.find('priority_high').on('click', self.set_file_priority, value, 'high')
-
-        self.find('files').post_item_bind = post_file_bind
 
         self.find('add_dialog').find('target_dir').value = os.path.expanduser('~transmission/Downloads')
         self.find('add_dialog').find('priority').value = 0
@@ -181,32 +173,14 @@ class TransmissionPlugin (SectionPlugin):
         except IndexError:
             pass
 
-    @on('priority_low', 'click')
-    def set_priority_low(self):
-        self.set_priority(self.scope.torrent, -1)
+    @on('set_priority', 'change')
+    def set_priority(self, item=None):
+        if not item:
+            item = self.scope.torrent
 
-    @on('priority_normal', 'click')
-    def set_priority_normal(self):
-        self.set_priority(self.scope.torrent, 0)
-
-    @on('priority_high', 'click')
-    def set_priority_high(self):
-        self.set_priority(self.scope.torrent, 1)
-
-    def set_priority(self, item, value):
-        self._client.torrent_set(ids=[item.id], bandwidthPriority=value)
-        self.refresh_item(item)
-
-    def toggle_priority(self, item):
-        self._client.torrent_set(ids=[item.id], bandwidthPriority=(
-                    {'low': -1, 'normal': 0, 'high': 1}[item.bandwidth_priority] + 2
-                    ) % 3 - 1)
-        self.refresh_item(item)
-
-    def set_file_priority(self, item, value):
         self.binder.update()
-        item.priority = value
-        self.binder.populate()
+        self._client.torrent_set(ids=[item.id], bandwidthPriority=item.bandwidth_priority)
+        self.refresh_item(item)
 
     def start(self, item):
         self._client.torrent_start(ids=[item.id])
