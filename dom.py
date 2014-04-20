@@ -16,3 +16,12 @@ class ContentBox (UIElement):
 @plugin
 class BigTextBox (UIElement):
     typeid = 'bigtextbox'
+
+
+@p('value', default=0, bindtypes=[int, long])
+@p('minvalue', default=0, type=int)
+@p('maxvalue', default=10, type=int)
+@p('width', default=None, type=int)
+@plugin
+class Slider (UIElement):
+    typeid = 'slider'
