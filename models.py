@@ -5,10 +5,8 @@ import operator as op
 import itertools as it
 import base64
 
-priority = {-1: 'low', 0: 'normal', 1: 'high'}.get
 mode = ['global', 'single', 'unlimited'].__getitem__
 eta = lambda v: 'unavailable' if v == -1 else 'unknown' if v == -2 else timedelta(v)
-intpriority = {'low': -1, 'normal': 0, 'high': 0}.get
 
 status = {
         # modern values compatible with old api
@@ -139,7 +137,7 @@ class FileStat(TorrentModel):
     _casts = {
             #'bytesCompleted': int,
             'wanted': bool,
-            'priority': priority,
+            'priority': int,
             }
 
 class PeersCount(TorrentModel):
@@ -221,7 +219,7 @@ class Torrent(TorrentModel):
             'addedDate': unixtime,
             #'announceResponse': str,
             #'announceURL': str,
-            'bandwidthPriority': priority,
+            'bandwidthPriority': int,
             #'comment': str,
             #'corruptEver': int,
             #'creator': str,
@@ -264,7 +262,7 @@ class Torrent(TorrentModel):
             'pieces': lambda v: bitfield(bytearray(base64.decodestring(v))),
             #'pieceCount': int,
             #'pieceSize': int,
-            'priorities': listof(priority),
+            'priorities': listof(int),
             #'queuePosition': int,
             #'rateDownload': int,
             #'rateUpload': int,
