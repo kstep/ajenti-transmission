@@ -11,8 +11,16 @@ Install **models** plugin into `/var/lib/ajenti/plugins` along with this plugin 
 # service restart ajenti
 ```
 
+You will also need to compile `content/js/dom.coffee` file with [CoffeeScript][] compiler:
+
+```
+# cd /var/lib/ajenti/plugins/transmission/content/js
+# coffee -c dom.coffee && mv dom.js dom.coffee.js && cp dom.coffee.js dom.coffee.c.js
+```
+
 Now login to your Ajenti panel and go to new **Transmission** menu item in **Software** section. You may need to configure it.
 
 [Ajenti]: http://ajenti.org/
 [Transmission]: http://www.transmissionbt.com/
 [models]: http://github.com/kstep/ajenti-models
+[CoffeeScript]: http://coffeescript.org/
