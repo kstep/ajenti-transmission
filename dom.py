@@ -18,6 +18,7 @@ class BigTextBox (UIElement):
     typeid = 'bigtextbox'
 
 
+@p('notify', default=True, type=bool)
 @p('value', default=0, bindtypes=[int, long])
 @p('minvalue', default=0, type=int)
 @p('maxvalue', default=10, type=int)

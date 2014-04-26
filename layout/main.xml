@@ -311,7 +311,7 @@
                                             </hc>
                                         </dtd>
                                         <dtd>
-                                            <slider minvalue="-1" maxvalue="1" bind="priority" width="50" />
+                                            <slider minvalue="-1" maxvalue="1" bind="priority" width="50" notify="False" />
                                         </dtd>
                                     </dtr>
                                 </bind:template>

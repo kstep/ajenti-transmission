@@ -29,9 +29,10 @@ class window.Controls.slider extends window.Control
         super(dom)
         @input = $(dom).find('input')
         @input.val(@properties.value)
-        @input[0].addEventListener 'change', (e) =>
-            if @event 'change'
-                @cancel(e)
+        if @properties.notify
+            @input[0].addEventListener 'change', (e) =>
+                if @event 'change'
+                    @cancel(e)
         return this
 
     detectUpdates: () ->
