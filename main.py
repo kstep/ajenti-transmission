@@ -174,12 +174,24 @@ class TransmissionPlugin (SectionPlugin):
             pass
 
     @on('set_priority', 'change')
-    def set_priority(self, item=None):
-        if not item:
-            item = self.scope.torrent
+    def set_priority(self, item, priority=None):
+        '''
+        Last argument is passed by event system from slider UI element,
+        real item can by either passed by handler set with `post_item_bind()`
+        hook, or not set at all.
 
-        self.binder.update()
-        self._client.torrent_set(ids=[item.id], bandwidthPriority=item.bandwidth_priority)
+        So if we have only one argument (priority is None), then
+        the first argument (item) is priority, and real item is currently
+        selected item (user selected slider in torrent details panels)."
+
+        Otherwise if we have both arguments, the first one is memoized
+        torrent object passed from `post_item_bind()` handler, and the
+        second argument is priority passed from UI event.
+        '''
+        if priority is None:
+            priority, item = item, self.scope.torrent
+
+        self._client.torrent_set(ids=[item.id], bandwidthPriority=priority)
         self.refresh_item(item)
 
     def start(self, item):
