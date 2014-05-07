@@ -31,7 +31,7 @@ class window.Controls.slider extends window.Control
         @input.val(@properties.value)
         if @properties.notify
             @input[0].addEventListener 'change', (e) =>
-                if @event 'change', @input.val()
+                if @event 'change', {'priority': parseInt(@input.val(), 10)}
                     @cancel(e)
         return this
 

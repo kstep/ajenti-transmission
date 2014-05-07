@@ -174,7 +174,7 @@ class TransmissionPlugin (SectionPlugin):
             pass
 
     @on('set_priority', 'change')
-    def set_priority(self, priority, item=None):
+    def set_priority(self, item=None, priority=0):
         if not item:
             item = self.scope.torrent
 
