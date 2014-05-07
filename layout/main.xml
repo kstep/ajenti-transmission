@@ -158,7 +158,7 @@
                                                 </ltd>
 
                                                 <ltd>
-                                                    <slider bind="bandwidth_priority" width="60" id="set_priority" maxvalue="1" minvalue="-1" />
+                                                    <slider bind="bandwidth_priority" width="60" id="set_torrent_priority" maxvalue="1" minvalue="-1" />
                                                 </ltd>
                                             </ltr>
                                         </lt>

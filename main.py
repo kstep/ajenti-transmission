@@ -173,7 +173,7 @@ class TransmissionPlugin (SectionPlugin):
         except IndexError:
             pass
 
-    @on('set_priority', 'change')
+    @on('set_torrent_priority', 'change')
     def set_priority(self, item=None, priority=0):
         if not item:
             item = self.scope.torrent
