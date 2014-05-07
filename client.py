@@ -24,23 +24,32 @@ class ProtocolError(TransmissionError):
 class Client(object):
     _commands = {
             'torrent-start': None,
+            'torrent-start-now': None,
             'torrent-stop': None,
             'torrent-verify': None,
             'torrent-reannounce': None,
 
             'torrent-set': None,
             'torrent-get': lambda r: map(Torrent, r['torrents']),
-            'torrent-add': lambda r: Torrent(r['torrent-added']),
+            'torrent-add': lambda r: Torrent(r.get('torrent-added') or r['torrent-duplicate']),
             'torrent-remove': None,
             'torrent-set-location': None,
+            'torrent-rename-path': None,
 
             'session-set': None,
             'session-get': Session,
             'session-stats': SessionStat,
+            'session-close': None,
 
             'blocklist-update': lambda r: r['blocklist-size'],
 
             'port-test': lambda r: r['port-is-open'],
+            'free-space': lambda r: r['size-bytes'],
+
+            'queue-move-up': None,
+            'queue-move-down': None,
+            'queue-move-top': None,
+            'queue-move-bottom': None,
             }
 
     def __init__(self, host='127.0.0.1', port=9091, path="transmission/rpc"):
