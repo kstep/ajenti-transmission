@@ -263,13 +263,13 @@
                             <formline text="{Download limits}">
                                 <hc>
                                     <textbox bind="download_limit" type="number" />
-                                    <checkbox bind="download_limited" text="{Use}" />
+                                    <checkbox bind="download_limited" />
                                 </hc>
                             </formline>
                             <formline text="{Upload limits}">
                                 <hc>
                                     <textbox bind="upload_limit" type="number" />
-                                    <checkbox bind="upload_limited" text="{Use}" />
+                                    <checkbox bind="upload_limited" />
                                 </hc>
                             </formline>
                             <formline text="{Ratio limits}">
@@ -462,104 +462,40 @@
         {'id': 'cancel', 'text': _('Cancel')}
         ]">
         <pad>
-            <formgroup text="{Storage options}">
-                <vc>
-                    <formline text="{Download directory}">
-                        <pathbox directory="True" bind="download_dir" />
-                    </formline>
-                </vc>
-            </formgroup>
-
-            <formgroup text="{Global limits}">
-                <vc>
-                    <formline text="{Download speed}">
-                        <hc>
-                            <textbox type="number" bind="speed_limit_down" />
-                            <checkbox text="{Use}" bind="speed_limit_down_enabled" />
-                        </hc>
-                    </formline>
-                    <formline text="{Upload speed}">
-                        <hc>
-                            <textbox type="number" bind="speed_limit_up" />
-                            <checkbox text="{Use}" bind="speed_limit_up_enabled" />
-                        </hc>
-                    </formline>
-                    <formline text="{Ratio}">
-                        <hc>
-                            <textbox type="number" bind="seed_ratio_limit" />
-                            <checkbox text="{Use}" bind="seed_ratio_limited" />
-                        </hc>
-                    </formline>
-                </vc>
-            </formgroup>
-
-            <formgroup text="{Alternate limits}">
-                <vc>
-                    <formline text="{Download speed}">
-                        <textbox type="number" bind="alt_speed_down" />
-                    </formline>
-                    <formline text="{Upload speed}">
-                        <textbox type="number" bind="alt_speed_up" />
-                    </formline>
-                    <formline text="{Enabled}">
-                        <checkbox text="{Active}" bind="alt_speed_enabled" />
-                    </formline>
-                </vc>
-            </formgroup>
-
-            <formgroup text="{Alternate limits schedule}">
-                <vc>
-                    <formline text="{Start time}">
-                        <textbox bind="alt_speed_time_begin" />
-                    </formline>
-                    <formline text="{End time}">
-                        <textbox bind="alt_speed_time_end" />
-                    </formline>
-                    <formline text="{Weekdays}">
-                        <bind:dict bind="alt_speed_time_day">
-                            <checkbox text="{Sunday}" bind="Sun" />
-                            <checkbox text="{Monday}" bind="Mon" />
-                            <checkbox text="{Tuesday}" bind="Tue" />
-                            <checkbox text="{Wednesday}" bind="Wed" />
-                            <checkbox text="{Thursday}" bind="Thu" />
-                            <checkbox text="{Friday}" bind="Fri" />
-                            <checkbox text="{Saturday}" bind="Sat" />
-                        </bind:dict>
-                    </formline>
-                    <formline text="{Enabled}">
-                        <checkbox text="{Active}" bind="alt_speed_time_enabled" />
-                    </formline>
-                </vc>
-            </formgroup>
-
-            <formgroup text="{Peer limits}">
-                <vc>
+            <tabs>
+                <tab title="{Connection}">
                     <formline text="{Maximum peers}">
-                        <textbox type="number" bind="peer_limit_global" />
+                        <hc>
+                            <textbox type="number" bind="peer_limit_global" style="mini" />
+                            <label text="{ / }" />
+                            <tooltip text="{Per torrent}"><textbox type="number" bind="peer_limit_per_torrent" style="mini" /></tooltip>
+                        </hc>
                     </formline>
-                    <formline text="{Max peers per torrent}">
-                        <textbox type="number" bind="peer_limit_per_torrent" />
-                    </formline>
-                </vc>
-            </formgroup>
 
-            <formgroup text="{Connection options}">
-                <vc>
-                    <formline text="{Use blocklist}">
-                        <checkbox text="{Active}" bind="blocklist_enabled" />
+                    <formline text="{Blocklist}">
+                        <hc>
+                            <textbox bind="blocklist_url" />
+                            <checkbox bind="blocklist_enabled" />
+                        </hc>
                     </formline>
-                    <formline text="{DHT enabled}">
-                        <checkbox text="{Active}" bind="dht_enabled" />
-                    </formline>
-                    <formline text="{PeX enabled}">
-                        <checkbox text="{Active}" bind="pex_enabled" />
+                    <formline text="{Protocols}">
+                        <lt>
+                            <ltr>
+                                <ltd><checkbox text="{DHT}" bind="dht_enabled" /></ltd>
+                                <ltd><checkbox text="{PeX}" bind="pex_enabled" /></ltd>
+                            </ltr>
+                            <ltr>
+                                <ltd><checkbox text="{LPD}" bind="lpd_enabled" /></ltd>
+                                <ltd><checkbox text="{μTP}" bind="utp_enabled" /></ltd>
+                            </ltr>
+                        </lt>
                     </formline>
                     <formline text="{Encryption}">
                         <dropdown values="['required', 'preferred', 'tolerated']" labels="['Required', 'Preferred', 'Tolerated']" bind="encryption" />
                     </formline>
                     <formline text="{Peer port}">
                         <hc>
-                            <textbox type="number" bind="peer_port" />
+                            <textbox type="number" bind="peer_port" style="mini" />
                             <icon bind="port_is_open" bindtransform="lambda v: 'ok' if v else 'ban-circle'" />
                         </hc>
                         <checkbox text="{Randomize on start}" bind="peer_port_random_on_start" />
@@ -567,8 +503,129 @@
                     <formline text="{Port forwarding}">
                         <checkbox text="{Active}" bind="port_forwarding_enabled" />
                     </formline>
-                </vc>
-            </formgroup>
+                </tab>
+
+                <tab title="{Storage}">
+                    <formline text="{Download directory}">
+                        <pathbox directory="True" bind="download_dir" />
+                    </formline>
+                    <formline text="{Incomplete directory}">
+                        <hc>
+                            <pathbox directory="True" bind="incomplete_dir" />
+                            <checkbox bind="incomplete_dir_enabled" />
+                        </hc>
+                    </formline>
+                    <formline text="{Rename partial files}">
+                        <checkbox text="{Active}" bind="rename_partial_files" />
+                    </formline>
+                    <formline text="{Trash original torrents}">
+                        <checkbox text="{Active}" bind="trash_original_torrent_files" />
+                    </formline>
+                    <formline text="{Cache size}">
+                        <hc>
+                            <textbox type="number" bind="cache_size_mb" style="mini" />
+                            <label text="{MB}" />
+                        </hc>
+                    </formline>
+                </tab>
+
+                <tab title="{Download}">
+                    <formline text="{Start new torrents}">
+                        <hc>
+                            <checkbox text="{Active}" bind="start_added_torrents" />
+                        </hc>
+                    </formline>
+                    <formline text="{Download speed}">
+                        <hc>
+                            <textbox type="number" bind="speed_limit_down" style="mini" />
+                            <checkbox bind="speed_limit_down_enabled" />
+                        </hc>
+                    </formline>
+                    <formline text="{Download queue}">
+                        <hc>
+                            <textbox type="number" bind="download_queue_size" style="mini" />
+                            <checkbox bind="download_queue_enabled" />
+                        </hc>
+                    </formline>
+                    <formline text="{Stall timeout}">
+                        <hc>
+                            <textbox type="number" bind="queue_stalled_minutes" style="mini" />
+                            <checkbox text="{min}" bind="queue_stalled_enabled" />
+                        </hc>
+                    </formline>
+                </tab>
+
+                <tab title="{Upload}">
+                    <formline text="{Upload speed}">
+                        <hc>
+                            <textbox type="number" bind="speed_limit_up" style="mini" />
+                            <checkbox bind="speed_limit_up_enabled" />
+                        </hc>
+                    </formline>
+                    <formline text="{Upload queue}">
+                        <hc>
+                            <textbox type="number" bind="seed_queue_size" style="mini" />
+                            <checkbox bind="seed_queue_enabled" />
+                        </hc>
+                    </formline>
+                    <formline text="{Ratio}">
+                        <hc>
+                            <textbox type="number" bind="seed_ratio_limit" style="mini" />
+                            <checkbox bind="seed_ratio_limited" />
+                        </hc>
+                    </formline>
+                    <formline text="{Idle seeding}">
+                        <hc>
+                            <textbox type="number" bind="idle_seeding_limit" style="mini" />
+                            <checkbox bind="idle_seeding_limit_enabled" text="{min}" />
+                        </hc>
+                    </formline>
+                </tab>
+                <tab title="{Automate}">
+                    <formline text="{Run script on done}">
+                        <hc>
+                            <pathbox bind="script_torrent_done_filename" />
+                            <checkbox bind="script_torrent_done_enabled" />
+                        </hc>
+                    </formline> 
+                    <formgroup text="{Alternate limits}">
+                        <vc>
+                            <formline text="{Speed limits}">
+                                <hc>
+                                    <icon icon="arrow-down" /><textbox type="number" bind="alt_speed_down" style="mini" />
+                                    <icon icon="arrow-up" /><textbox type="number" bind="alt_speed_up" style="mini" />
+                                    <checkbox bind="alt_speed_enabled" />
+                                </hc>
+                            </formline>
+                            <formline text="{Time}">
+                                <hc>
+                                    <icon icon="time" />
+                                    <textbox style="mini" bind="alt_speed_time_begin" />
+                                    <icon icon="ellipsis-horizontal" />
+                                    <textbox style="mini" bind="alt_speed_time_end" />
+                                </hc>
+                            </formline>
+                            <formline text="{Weekdays}">
+                                <bind:dict bind="alt_speed_time_day">
+                                    <lt>
+                                        <ltr>
+                                            <ltd><checkbox text="{S}" bind="Sun" /></ltd>
+                                            <ltd><checkbox text="{M}" bind="Mon" /></ltd>
+                                            <ltd><checkbox text="{T}" bind="Tue" /></ltd>
+                                            <ltd><checkbox text="{W}" bind="Wed" /></ltd>
+                                        </ltr>
+                                        <ltr>
+                                            <ltd><checkbox text="{T}" bind="Thu" /></ltd>
+                                            <ltd><checkbox text="{F}" bind="Fri" /></ltd>
+                                            <ltd><checkbox text="{S}" bind="Sat" /></ltd>
+                                        </ltr>
+                                    </lt>
+                                </bind:dict>
+                            </formline>
+                        </vc>
+                    </formgroup>
+                </tab>
+            </tabs>
         </pad>
     </dialog>
 
