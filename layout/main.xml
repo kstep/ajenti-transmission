@@ -625,6 +625,35 @@
                         </vc>
                     </formgroup>
                 </tab>
+                <tab title="{Units}" binder:context="units">
+                    <formline text="{Speed units}">
+                        <textbox type="number" style="mini" bind="speed_bytes" />
+                        <bind:list bind="speed_units" values="lambda v: map(lambda v: type('', (), {'value': v}), v)">
+                            <box><textbox bind="value" style="mini" /></box>
+                            <box><textbox bind="value" style="mini" /></box>
+                            <box><textbox bind="value" style="mini" /></box>
+                            <box><textbox bind="value" style="mini" /></box>
+                        </bind:list>
+                    </formline>
+                    <formline text="{Size units}">
+                        <textbox type="number" style="mini" bind="size_bytes" />
+                        <bind:list bind="size_units" values="lambda v: map(lambda v: type('', (), {'value': v}), v)">
+                            <box><textbox bind="value" style="mini" /></box>
+                            <box><textbox bind="value" style="mini" /></box>
+                            <box><textbox bind="value" style="mini" /></box>
+                            <box><textbox bind="value" style="mini" /></box>
+                        </bind:list>
+                    </formline>
+                    <formline text="{Memory units}">
+                        <textbox type="number" style="mini" bind="memory_bytes" />
+                        <bind:list bind="memory_units" values="lambda v: map(lambda v: type('', (), {'value': v}), v)">
+                            <box><textbox bind="value" style="mini" /></box>
+                            <box><textbox bind="value" style="mini" /></box>
+                            <box><textbox bind="value" style="mini" /></box>
+                            <box><textbox bind="value" style="mini" /></box>
+                        </bind:list>
+                    </formline>
+                </tab>
             </tabs>
         </pad>
     </dialog>
