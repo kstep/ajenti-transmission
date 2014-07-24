@@ -1,5 +1,5 @@
 # -*- encoding: utf-8 -*-
-from __future__ import division
+from __future__ import division, with_statement
 from ajenti.api import *  # noqa
 from ajenti.api.http import HttpPlugin, url
 from ajenti.plugins import *  # noqa
@@ -13,6 +13,7 @@ from ajenti.plugins.models.api import Model
 from ajenti.plugins.configurator.api import ClassConfigEditor
 from datetime import datetime
 from requests import ConnectionError
+from contextlib import contextmanager
 import time
 import base64
 import gevent
@@ -54,6 +55,14 @@ class TransmissionPlugin (SectionPlugin):
             #'announceResponse', 'scrapeResponse'
             'honorsSessionLimits', 'peer-limit', 'downloadLimit', 'downloadLimited',
             'seedRatioLimit', 'seedRationMode', 'uploadLimit', 'uploadLimited']
+        
+    @contextmanager    
+    def configure_on_error(self):
+        try:
+            yield
+        except ConnectionError, e:
+            self.context.notify('error', str(e))
+            self.context.launch('configure-plugin', plugin=self)
 
     def init(self):
         # meta-data
@@ -80,7 +89,7 @@ class TransmissionPlugin (SectionPlugin):
     def on_first_page_load(self):
         self._client = Client(**self.classconfig)
 
-        try:
+        with self.configure_on_error():
             self.scope.session = self._client.session_get()
             self.scope.session.port_is_open = self._client.port_test()
             self.scope.session_stats = self._client.session_stats()
@@ -91,10 +100,6 @@ class TransmissionPlugin (SectionPlugin):
 
             if not self.scope.session.port_is_open:
                 self.context.notify('error', 'Peer port %s is closed' % self.scope.session.peer_port)
-
-        except ConnectionError, e:
-            self.context.notify('error', str(e))
-            self.context.launch('configure-plugin', plugin=self)
 
     @on('status_filter', 'switch')
     def set_filter(self):
@@ -107,14 +112,15 @@ class TransmissionPlugin (SectionPlugin):
     def apply_limits(self):
         self.binder.update()
 
-        self._client.torrent_set(ids=[self.scope.torrent.id],
-                downloadLimit=self.scope.torrent.download_limit,
-                downloadLimited=self.scope.torrent.download_limited,
-                uploadLimit=self.scope.torrent.upload_limit,
-                uploadLimited=self.scope.torrent.upload_limited,
-                seedRatioLimit=self.scope.torrent.seed_ratio_limit,
-                seedRatioMode={'global': 0, 'single': 1, 'unlimited': 2}.get(self.scope.torrent.seed_ratio_mode),
-                honorsSessionLimits=self.scope.torrent.honors_session_limits)
+        with self.configure_on_error():
+            self._client.torrent_set(ids=[self.scope.torrent.id],
+                    downloadLimit=self.scope.torrent.download_limit,
+                    downloadLimited=self.scope.torrent.download_limited,
+                    uploadLimit=self.scope.torrent.upload_limit,
+                    uploadLimited=self.scope.torrent.upload_limited,
+                    seedRatioLimit=self.scope.torrent.seed_ratio_limit,
+                    seedRatioMode={'global': 0, 'single': 1, 'unlimited': 2}.get(self.scope.torrent.seed_ratio_mode),
+                    honorsSessionLimits=self.scope.torrent.honors_session_limits)
 
         self.refresh()
 
@@ -144,15 +150,17 @@ class TransmissionPlugin (SectionPlugin):
         if priority_high:
             data['priority_high'] = priority_high
 
-        self._client.torrent_set(ids=ids, **data)
+        with self.configure_on_error():
+            self._client.torrent_set(ids=ids, **data)
 
         self.refresh()
 
     @on('refresh', 'click')
     def refresh(self):
-        self.scope.torrents[:] = self._client.torrent_get(fields=self.TORRENT_FIELDS)
-        self.scope.session.update(self._client.session_get())
-        self.scope.session.port_is_open = self._client.port_test()
+        with self.configure_on_error():
+            self.scope.torrents[:] = self._client.torrent_get(fields=self.TORRENT_FIELDS)
+            self.scope.session.update(self._client.session_get())
+            self.scope.session.port_is_open = self._client.port_test()
 
         for t in self.scope.torrents:
             if t.error:
@@ -164,62 +172,75 @@ class TransmissionPlugin (SectionPlugin):
             self.binder.populate()
 
     def refresh_item(self, item):
-        try:
-            item.update(self._client.torrent_get(ids=[item.id], fields=self.TORRENT_FIELDS)[0])
-            if item.error:
-                self.context.notify('error', 'Torrent #%s (%s): %s' % (item.id, item.name, item.error_string))
-            self.binder.populate()
-
-        except IndexError:
-            pass
+        with self.configure_on_error():
+            try:
+                item.update(self._client.torrent_get(ids=[item.id], fields=self.TORRENT_FIELDS)[0])
+                if item.error:
+                    self.context.notify('error', 'Torrent #%s (%s): %s' % (item.id, item.name, item.error_string))
+                self.binder.populate()
+    
+            except IndexError:
+                pass
 
     @on('set_torrent_priority', 'change')
     def set_priority(self, item=None, priority=0):
         if not item:
             item = self.scope.torrent
 
-        self._client.torrent_set(ids=[item.id], bandwidthPriority=priority)
+        with self.configure_on_error():
+            self._client.torrent_set(ids=[item.id], bandwidthPriority=priority)
+
         self.refresh_item(item)
 
     def start(self, item):
-        self._client.torrent_start(ids=[item.id])
+        with self.configure_on_error():
+            self._client.torrent_start(ids=[item.id])
         self.refresh_item(item)
 
     def stop(self, item):
-        self._client.torrent_stop(ids=[item.id])
+        with self.configure_on_error():
+            self._client.torrent_stop(ids=[item.id])
         self.refresh_item(item)
 
     @on('start_all', 'click')
     def start_all(self):
-        self._client.start_all()
+        with self.configure_on_error():
+            self._client.start_all()
         self.refresh()
 
     @on('stop_all', 'click')
     def stop_all(self):
-        self._client.stop_all()
+        with self.configure_on_error():
+            self._client.stop_all()
         self.refresh()
 
     def recheck(self, item):
-        self._client.torrent_verify(ids=[item.id])
+        with self.configure_on_error():
+            self._client.torrent_verify(ids=[item.id])
         self.refresh_item(item)
 
     def details(self, item):
-        self.scope.torrent.update(self._client.torrent_get(ids=[item.id], fields=self.TORRENT_FIELDS_DETAILED)[0])
+        with self.configure_on_error():
+            self.scope.torrent.update(self._client.torrent_get(ids=[item.id], fields=self.TORRENT_FIELDS_DETAILED)[0])
         self.binder.populate()
 
     def remove(self, item, collection):
-        self._client.torrent_remove(ids=[item.id], delete_local_data=False)
+        with self.configure_on_error():
+            self._client.torrent_remove(ids=[item.id], delete_local_data=False)
 
     def delete(self, item, collection):
-        self._client.torrent_remove(ids=[item.id], delete_local_data=True)
+        with self.configure_on_error():
+            self._client.torrent_remove(ids=[item.id], delete_local_data=True)
 
     #@on('reannounce', 'click')
     def reannounce(self):
-        self._client.torrent_reannounce(ids=[self.scope.torrent.id])
+        with self.configure_on_error():
+            self._client.torrent_reannounce(ids=[self.scope.torrent.id])
 
     @on('stats', 'click')
     def open_stats_dialog(self):
-        self.scope.session_stats.update(self._client.session_stats())
+        with self.configure_on_error():
+            self.scope.session_stats.update(self._client.session_stats())
         self.find('stats_dialog').visible = True
 
     @on('stats_dialog', 'button')
@@ -233,7 +254,8 @@ class TransmissionPlugin (SectionPlugin):
     @on('alt_speed', 'click')
     def toggle_alt_speed(self):
         alt_speed = self.scope.session.alt_speed_enabled = not self.scope.session.alt_speed_enabled
-        self._client.session_set(alt_speed_enabled=alt_speed)
+        with self.configure_on_error():
+            self._client.session_set(alt_speed_enabled=alt_speed)
         self.binder.populate()
 
     @on('config_dialog', 'button')
@@ -243,31 +265,32 @@ class TransmissionPlugin (SectionPlugin):
 
         if button == 'apply':
             self.binder.update()
-            self._client.session_set(
-                    alt_speed_down=self.scope.session.alt_speed_down,
-                    alt_speed_up=self.scope.session.alt_speed_up,
-                    alt_speed_enabled=self.scope.session.alt_speed_enabled,
-                    alt_speed_time_begin=reduce(lambda a, t: a * 60 + int(t), self.scope.session.alt_speed_time_begin.split(':', 1), 0),
-                    alt_speed_time_end=reduce(lambda a, t: a * 60 + int(t), self.scope.session.alt_speed_time_end.split(':', 1), 0),
-                    alt_speed_time_day=int(self.scope.session.alt_speed_time_day),
-                    dht_enabled=self.scope.session.dht_enabled,
-                    pex_enabled=self.scope.session.pex_enabled,
-                    encryption=self.scope.session.encryption,
-                    download_dir=self.scope.session.download_dir,
-
-                    peer_limit_global=self.scope.session.peer_limit_global,
-                    peer_limit_per_torrent=self.scope.session.peer_limit_per_torrent,
-                    peer_port=self.scope.session.peer_port,
-                    peer_port_random_on_start=self.scope.session.peer_port_random_on_start,
-                    port_forwarding_enabled=self.scope.session.port_forwarding_enabled,
-
-                    seedRatioLimit=self.scope.session.seed_ratio_limit,
-                    seedRatioLimited=self.scope.session.seed_ratio_limited,
-                    speed_limit_down=self.scope.session.speed_limit_down,
-                    speed_limit_up=self.scope.session.speed_limit_up,
-                    speed_limit_down_enabled=self.scope.session.speed_limit_down_enabled,
-                    speed_limit_up_enabled=self.scope.session.speed_limit_up_enabled,
-                    )
+            with self.configure_on_error():
+                self._client.session_set(
+                        alt_speed_down=self.scope.session.alt_speed_down,
+                        alt_speed_up=self.scope.session.alt_speed_up,
+                        alt_speed_enabled=self.scope.session.alt_speed_enabled,
+                        alt_speed_time_begin=reduce(lambda a, t: a * 60 + int(t), self.scope.session.alt_speed_time_begin.split(':', 1), 0),
+                        alt_speed_time_end=reduce(lambda a, t: a * 60 + int(t), self.scope.session.alt_speed_time_end.split(':', 1), 0),
+                        alt_speed_time_day=int(self.scope.session.alt_speed_time_day),
+                        dht_enabled=self.scope.session.dht_enabled,
+                        pex_enabled=self.scope.session.pex_enabled,
+                        encryption=self.scope.session.encryption,
+                        download_dir=self.scope.session.download_dir,
+    
+                        peer_limit_global=self.scope.session.peer_limit_global,
+                        peer_limit_per_torrent=self.scope.session.peer_limit_per_torrent,
+                        peer_port=self.scope.session.peer_port,
+                        peer_port_random_on_start=self.scope.session.peer_port_random_on_start,
+                        port_forwarding_enabled=self.scope.session.port_forwarding_enabled,
+    
+                        seedRatioLimit=self.scope.session.seed_ratio_limit,
+                        seedRatioLimited=self.scope.session.seed_ratio_limited,
+                        speed_limit_down=self.scope.session.speed_limit_down,
+                        speed_limit_up=self.scope.session.speed_limit_up,
+                        speed_limit_down_enabled=self.scope.session.speed_limit_down_enabled,
+                        speed_limit_up_enabled=self.scope.session.speed_limit_up_enabled,
+                        )
 
     @on('add', 'click')
     def open_add_dialog(self):
@@ -309,13 +332,16 @@ class TransmissionPlugin (SectionPlugin):
                 else:
                     return
 
-            added_torrent = self._client.torrent_add(**options)
+            with self.configure_on_error():
+                added_torrent = self._client.torrent_add(**options)
+
             self.details(added_torrent)
             self.refresh()
 
     @on('move', 'click')
     def move(self):
-        self._client.torrent_set_location(ids=[self.scope.torrent.id],
+        with self.configure_on_error():
+            self._client.torrent_set_location(ids=[self.scope.torrent.id],
                 location=self.find('download_dir').value, move=True)
         self.refresh_item(self.scope.torrent)
 
