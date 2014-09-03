@@ -6,7 +6,8 @@ It also requires [models][] Ajenti plugin.
 Install **models** plugin into `/var/lib/ajenti/plugins` along with this plugin and restart **Ajenti**:
 
 ```
-# git clone https://github.com/kstep/ajenti-models.git /var/lib/ajenti/plugins
+# mkdir -p /var/lib/ajenti/plugins/{models,transmission}
+# git clone https://github.com/kstep/ajenti-models.git /var/lib/ajenti/plugins/models
 # git clone https://github.com/kstep/ajenti-transmission.git /var/lib/ajenti/plugins/transmission
 # service restart ajenti
 ```
