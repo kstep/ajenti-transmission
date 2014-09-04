@@ -7,7 +7,7 @@ from ajenti.plugins.main.api import SectionPlugin
 from ajenti.ui.binder import Binder
 from ajenti.ui import on
 from ajenti.util import str_fsize, str_timedelta
-from ajenti.plugins.transmission.client import Client
+from ajenti.plugins.transmission.client import Client, AuthorizationError
 from ajenti.plugins.transmission.models import Torrent, Session, SessionStat
 from ajenti.plugins.models.api import Model
 from ajenti.plugins.configurator.api import ClassConfigEditor
