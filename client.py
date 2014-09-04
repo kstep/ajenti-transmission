@@ -21,6 +21,15 @@ class ProtocolError(TransmissionError):
     pass
 
 
+class AuthorizationError(ProtocolError):
+    pass
+
+class InvalidTagError(ProtocolError):
+    pass
+
+class InvalidStatusError(ProtocolError):
+    pass
+
 class Client(object):
     _commands = {
             'torrent-start': None,
@@ -95,7 +104,7 @@ class Client(object):
                 raise CommandError(result['result'], result.get('arguments'))
 
             if result['tag'] != tag:
-                raise ProtocolError('unexpected tag %s instead of %s' % (result['tag'], tag))
+                raise InvalidTagError('unexpected tag %s instead of %s' % (result['tag'], tag))
 
             if result.get('arguments'):
                 return self._commands.get(name, Result)(result['arguments'])
@@ -104,8 +113,11 @@ class Client(object):
             self._token = result.headers['X-Transmission-Session-Id']
             return self._do_request(name, args)
 
+        elif result.status_code == 401:
+            raise AuthorizationError('invalid authorization')
+
         else:
-            raise ProtocolError('unexpected status code %s' % result.status_code)
+            raise InvalidStatusError('unexpected status code %s' % result.status_code)
 
     def start_all(self):
         self.torrent_start(ids=map(op.attrgetter('id'), self.torrent_get(fields=['id'])))
