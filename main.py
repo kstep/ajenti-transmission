@@ -60,7 +60,7 @@ class TransmissionPlugin (SectionPlugin):
     def configure_on_error(self):
         try:
             yield
-        except ConnectionError, e:
+        except (ConnectionError, AuthorizationError), e:
             self.context.notify('error', str(e))
             self.context.launch('configure-plugin', plugin=self)
 
