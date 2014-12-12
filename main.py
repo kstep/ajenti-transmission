@@ -55,6 +55,8 @@ class TransmissionPlugin (SectionPlugin):
             #'announceResponse', 'scrapeResponse'
             'honorsSessionLimits', 'peer-limit', 'downloadLimit', 'downloadLimited',
             'seedRatioLimit', 'seedRationMode', 'uploadLimit', 'uploadLimited']
+
+    _binder = None
         
     @contextmanager    
     def configure_on_error(self):
@@ -95,11 +97,16 @@ class TransmissionPlugin (SectionPlugin):
             self.scope.session_stats = self._client.session_stats()
             self.scope.torrents = self._client.torrent_get(fields=self.TORRENT_FIELDS)
             self.scope.torrent = self._client.torrent_get(fields=self.TORRENT_FIELDS_DETAILED)[0]
-            self.binder = Binder(self.scope, self.find('main'))
-            self.binder.populate()
 
             if not self.scope.session.port_is_open:
                 self.context.notify('error', 'Peer port %s is closed' % self.scope.session.peer_port)
+
+    @property
+    def binder(self):
+        if not self._binder:
+            self._binder = Binder(self.scope, self.find('main'))
+            self._binder.populate()
+        return self._binder
 
     @on('status_filter', 'switch')
     def set_filter(self):
